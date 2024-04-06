@@ -15,7 +15,9 @@
 
 	let animation_pointer = 0;
 
-	let animtion_data: AnimationData;
+	let animtion_data: AnimationData = new AnimationData({});
+
+	let total_frames = 0;
 
 	function animate() {
 		// update physics world and threejs renderer
@@ -45,9 +47,9 @@
 
 			threeScene.scene.add(glb_model);
 
-			animtion_data = new AnimationData(anim_data);
+			animtion_data.loadData(anim_data);
 
-			console.log(animtion_data);
+			total_frames = animtion_data.total_frames;
 		});
 	});
 
@@ -57,6 +59,8 @@
 
 		threeScene.dispose();
 	});
+
+	$: console.log(animtion_data.current_frame);
 </script>
 
 <section>
@@ -64,9 +68,9 @@
 
 	<div class="control-box">
 		<Slider
-			init_value={0}
 			min_value={0}
-			max_value={animtion_data ? animtion_data.total_frames : 100}
+			max_value={total_frames}
+			bind:value={animtion_data.current_frame}
 		/>
 	</div>
 </section>

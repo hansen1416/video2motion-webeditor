@@ -1,15 +1,13 @@
 <script lang="ts">
 	import { onDestroy, onMount } from "svelte";
 
-	export let init_value: number;
-
 	export let min_value: number;
 
 	export let max_value: number;
 
-	let slider_input: HTMLInputElement;
+	export let value: number;
 
-	let value = init_value;
+	let slider_input: HTMLInputElement;
 
 	// output.innerHTML = slider.value; // Display the default slider value
 
@@ -19,8 +17,6 @@
 	// };
 
 	onMount(() => {
-		// console.log(slider_input);
-
 		slider_input.oninput = (e: Event) => {
 			value = parseInt((e.target as HTMLInputElement).value);
 		};
@@ -38,7 +34,7 @@
 		type="range"
 		min={min_value}
 		max={max_value}
-		value="50"
+		{value}
 		class="slider"
 		id="myRange"
 	/>
