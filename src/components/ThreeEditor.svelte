@@ -1,18 +1,15 @@
-<script>
+<script lang="ts">
 	import { onDestroy, onMount } from "svelte";
-	import * as THREE from "three";
 	import ThreeScene from "../lib/ThreeScene";
 	import Slider from "../components/Slider.svelte";
 	import Stats from "three/examples/jsm/libs/stats.module.js";
 	import { loadGLTF, loadJSON } from "../utils/ropes";
 
-	/** @type {HTMLCanvasElement} */
-	let canvas;
+	let canvas: HTMLCanvasElement;
 
-	/** @type {ThreeScene} */
-	let threeScene;
-	/** @type {Stats} */
-	let stats;
+	let threeScene: ThreeScene;
+
+	let stats: Stats;
 
 	let animation_pointer = 0;
 

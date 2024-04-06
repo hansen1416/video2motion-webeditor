@@ -1,13 +1,13 @@
-<script>
+<script lang="ts">
 	import { onDestroy, onMount } from "svelte";
-	/** @type {number} */
-	export let init_value;
-	/** @type {number} */
-	export let min_value;
-	/** @type {number} */
-	export let max_value;
 
-	let slider_input;
+	export let init_value: number;
+
+	export let min_value: number;
+
+	export let max_value: number;
+
+	let slider_input: HTMLInputElement;
 
 	let value = init_value;
 
@@ -21,10 +21,8 @@
 	onMount(() => {
 		// console.log(slider_input);
 
-		slider_input.oninput = (
-			/** @type {{"target": HTMLInputElement}} */ e,
-		) => {
-			value = ~~e.target.value;
+		slider_input.oninput = (e: Event) => {
+			value = parseInt((e.target as HTMLInputElement).value);
 		};
 	});
 

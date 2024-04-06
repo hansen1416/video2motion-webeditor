@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { OrbitControls } from '@three-ts/orbit-controls';
+import Stats from "three/examples/jsm/libs/stats.module.js";
 import { MathUtils } from "three/src/math/MathUtils.js";
 
 
@@ -7,8 +8,6 @@ const CAMERA_DISTANCE = 2;
 
 const CameraOffset = new THREE.Vector3(0, 0.6, CAMERA_DISTANCE);
 
-
-let instance;
 
 /**
  * @class ThreeScene
@@ -26,18 +25,24 @@ let instance;
  * @method resetControl
  */
 export default class ThreeScene {
+
+    scene: THREE.Scene;
+
+    camera: THREE.PerspectiveCamera;
+
+    renderer: THREE.WebGLRenderer;
+
+    controls: OrbitControls;
+
+
     /**
-     *
-     * @param {HTMLCanvasElement} canvas
-     * @param {number} width
-     * @param {number} height
-     * @returns
+     * 
+     * @param canvas 
+     * @param width 
+     * @param height 
      */
-    constructor(canvas, width, height) {
-        // make it a singleton, so we only have 1 threejs scene
-        if (instance) {
-            return instance;
-        }
+    constructor(canvas: HTMLCanvasElement, width:number, height:number) {
+
 
         this.scene = new THREE.Scene();
 
@@ -96,7 +101,7 @@ export default class ThreeScene {
 
         this.renderer.setSize(width, height);
 
-        instance = this;
+
     }
 
     dispose () {
@@ -107,7 +112,7 @@ export default class ThreeScene {
         // this.renderer = null;
     }
 
-    onFrameUpdate (stats) {
+    onFrameUpdate (stats:Stats | null = null) {
 
         // this.followTarget(0, 270);
 
@@ -146,27 +151,27 @@ export default class ThreeScene {
         this.camera.lookAt(object_position);
     }
 
-    setCamera (target, elevation, azimuth) {
-        // Create a Spherical object and assign it the internal values of OrbitControls.
-        const spherical = new THREE.Spherical();
+    // setCamera (target, elevation, azimuth) {
+    //     // Create a Spherical object and assign it the internal values of OrbitControls.
+    //     const spherical = new THREE.Spherical();
 
-        // set Spherical position
-        // spherical.position.set(position);
+    //     // set Spherical position
+    //     // spherical.position.set(position);
 
 
-        // Set the new values on the Spherical object.
-        spherical.radius = CAMERA_DISTANCE;
-        spherical.phi = MathUtils.degToRad(elevation);
-        spherical.theta = MathUtils.degToRad(azimuth);
+    //     // Set the new values on the Spherical object.
+    //     spherical.radius = CAMERA_DISTANCE;
+    //     spherical.phi = MathUtils.degToRad(elevation);
+    //     spherical.theta = MathUtils.degToRad(azimuth);
 
-        // Update the camera position.
-        this.camera.position.setFromSpherical(spherical);
+    //     // Update the camera position.
+    //     this.camera.position.setFromSpherical(spherical);
 
-        this.camera.position.x += target.position.x;
-        this.camera.position.y += target.position.y;
+    //     this.camera.position.x += target.position.x;
+    //     this.camera.position.y += target.position.y;
 
-        this.camera.lookAt(target.position);
-    }
+    //     this.camera.lookAt(target.position);
+    // }
 
     /**
      * 
