@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { onDestroy, onMount } from "svelte";
-	import ThreeScene from "../lib/ThreeScene";
 	import Slider from "../components/Slider.svelte";
 	import Stats from "three/examples/jsm/libs/stats.module.js";
+
+	import ThreeScene from "../lib/ThreeScene";
+	import AnimationData from "../lib/AnimationData";
 	import { loadGLTF, loadJSON } from "../utils/ropes";
 
 	let canvas: HTMLCanvasElement;
@@ -12,6 +14,8 @@
 	let stats: Stats;
 
 	let animation_pointer = 0;
+
+	let animtion_data: AnimationData;
 
 	function animate() {
 		// update physics world and threejs renderer
@@ -41,7 +45,9 @@
 
 			threeScene.scene.add(glb_model);
 
-			console.log(anim_data);
+			animtion_data = new AnimationData(anim_data);
+
+			console.log(animtion_data);
 		});
 	});
 
@@ -57,7 +63,11 @@
 	<canvas bind:this={canvas} />
 
 	<div class="control-box">
-		<Slider init_value={30} min_value={0} max_value={300} />
+		<Slider
+			init_value={0}
+			min_value={0}
+			max_value={animtion_data ? animtion_data.total_frames : 100}
+		/>
 	</div>
 </section>
 
