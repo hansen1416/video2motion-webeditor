@@ -1,10 +1,13 @@
 <script lang="ts">
 	import { onDestroy, onMount } from "svelte";
-	import Slider from "../components/Slider.svelte";
+	import * as THREE from "three";
 	import Stats from "three/examples/jsm/libs/stats.module.js";
 
+	import Slider from "../components/Slider.svelte";
 	import ThreeScene from "../lib/ThreeScene";
-	import AnimationData from "../lib/AnimationData";
+	import AnimationData, {
+		type AnimationFrameDataObject,
+	} from "../lib/AnimationData";
 	import { loadGLTF, loadJSON } from "../utils/ropes";
 
 	let canvas: HTMLCanvasElement;
@@ -18,6 +21,10 @@
 	let animtion_data: AnimationData = new AnimationData({});
 
 	let total_frames = 0;
+
+	let current_pose: AnimationFrameDataObject = {};
+
+	let bones: { [key: string]: THREE.Object3D } = {};
 
 	function animate() {
 		// update physics world and threejs renderer
@@ -47,6 +54,21 @@
 
 			threeScene.scene.add(glb_model);
 
+			glb_model.traverse((node: THREE.Object3D) => {
+				// @ts-ignore
+				if (node.isMesh) {
+					node.castShadow = true;
+				}
+				// @ts-ignore
+				if (node.isBone) {
+					// @ts-ignore
+					if (bones[node.name] === undefined) {
+						// somehow maximo has double bones, so only use the first one
+						bones[node.name] = node;
+					}
+				}
+			});
+
 			animtion_data.loadData(anim_data);
 
 			total_frames = animtion_data.total_frames;
@@ -60,7 +82,21 @@
 		threeScene.dispose();
 	});
 
-	$: console.log(animtion_data.current_frame);
+	$: if (animtion_data && bones) {
+		current_pose = animtion_data.getFrameData();
+
+		for (const bone_name in current_pose) {
+			const bone = bones[bone_name];
+
+			if (bone) {
+				const [x, y, z, w] = current_pose[bone_name];
+
+				bone.rotation.setFromQuaternion(
+					new THREE.Quaternion(x, y, z, w),
+				);
+			}
+		}
+	}
 </script>
 
 <section>
