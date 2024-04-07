@@ -9,6 +9,7 @@
 		type AnimationDataObject,
 		type AnimationFrameDataObject,
 	} from "../lib/AnimationData";
+	import Skeleton from "../lib/Skeleton";
 	import { loadGLTF, loadJSON } from "../utils/ropes";
 
 	let canvas: HTMLCanvasElement;
@@ -26,6 +27,10 @@
 	let current_pose: AnimationFrameDataObject = {};
 
 	let bones: { [key: string]: THREE.Object3D } = {};
+
+	let skeleton = new Skeleton();
+
+	let diva: THREE.Object3D;
 
 	function animate() {
 		// update physics world and threejs renderer
@@ -49,15 +54,15 @@
 				`/anim-calculated-quaternion/180 Turn W_ Briefcase (1)-30-0.json`,
 			),
 		]).then(([gltf, anim_data]) => {
-			const glb_model = gltf.scene.children[0];
+			diva = gltf.scene.children[0];
 
-			glb_model.name = "diva";
+			diva.name = "diva";
 
-			glb_model.position.set(0, -1, 0);
+			diva.position.set(0, -1, 0);
 
-			threeScene.scene.add(glb_model);
+			threeScene.scene.add(diva);
 
-			glb_model.traverse((node: THREE.Object3D) => {
+			diva.traverse((node: THREE.Object3D) => {
 				// @ts-ignore
 				if (node.isMesh) {
 					node.castShadow = true;
@@ -75,6 +80,10 @@
 			animtion_data.loadData(anim_data as AnimationDataObject);
 
 			total_frames = animtion_data.total_frames;
+
+			setDivaOpacity(0.6);
+
+			addSkeleton();
 		});
 	});
 
@@ -99,6 +108,23 @@
 				);
 			}
 		}
+	}
+
+	function setDivaOpacity(opacity: number): void {
+		for (const child of diva.children) {
+			if (child instanceof THREE.SkinnedMesh === false) continue;
+
+			const mat = (child as THREE.SkinnedMesh)
+				.material as THREE.MeshStandardMaterial;
+
+			mat.transparent = true;
+			mat.opacity = opacity;
+		}
+	}
+
+	function addSkeleton() {
+		// add skeletion to scene
+		threeScene.scene.add(skeleton.mesh);
 	}
 </script>
 
