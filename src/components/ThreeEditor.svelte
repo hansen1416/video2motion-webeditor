@@ -6,6 +6,7 @@
 	import Slider from "../components/Slider.svelte";
 	import ThreeScene from "../lib/ThreeScene";
 	import AnimationData, {
+		type AnimationDataObject,
 		type AnimationFrameDataObject,
 	} from "../lib/AnimationData";
 	import { loadGLTF, loadJSON } from "../utils/ropes";
@@ -44,7 +45,9 @@
 
 		Promise.all([
 			loadGLTF(`/glb/dors.glb`),
-			loadJSON(`/anim-json/180 Turn W_ Briefcase (1)-30-0.json`),
+			loadJSON(
+				`/anim-calculated-quaternion/180 Turn W_ Briefcase (1)-30-0.json`,
+			),
 		]).then(([gltf, anim_data]) => {
 			const glb_model = gltf.scene.children[0];
 
@@ -69,7 +72,7 @@
 				}
 			});
 
-			animtion_data.loadData(anim_data);
+			animtion_data.loadData(anim_data as AnimationDataObject);
 
 			total_frames = animtion_data.total_frames;
 		});
