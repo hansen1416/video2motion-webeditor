@@ -2,8 +2,10 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { BVHLoader } from "three/examples/jsm/loaders/BVHLoader.js";
-import { type GLTF } from "three/examples/jsm/loaders/GLTFLoader.d.ts"
-import { type BVH } from "three/examples/jsm/loaders/BVHLoader.d.ts"
+// @ts-ignore
+import { type GLTF } from "@types/three/examples/jsm/loaders/GLTFLoader.d.ts"
+// @ts-ignore
+import { type BVH } from "@types/three/examples/jsm/loaders/BVHLoader.d.ts"
 import * as THREE from "three";
 
 export function loadBVH (url: string): Promise<BVH> {
