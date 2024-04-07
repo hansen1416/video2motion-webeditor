@@ -4,7 +4,7 @@ import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { BVHLoader } from "three/examples/jsm/loaders/BVHLoader.js";
 // import BVHLoader from "../lib/bvhloader.js";
 
-export function loadBVH (url) {
+export function loadBVH (url: string) {
     return new Promise((resolve) => {
         const loader = new BVHLoader();
         loader.load(url,
@@ -18,14 +18,14 @@ export function loadBVH (url) {
     });
 }
 
-export function loadGLTF (url) {
+export function loadGLTF (url: string) {
     return new Promise((resolve) => {
         const loader = new GLTFLoader();
         loader.load(url, (gltf) => resolve(gltf));
     });
 }
 
-export function loadFBX (url) {
+export function loadFBX (url: string) {
     return new Promise((resolve) => {
         const fbxLoader = new FBXLoader();
         fbxLoader.load(
@@ -43,13 +43,13 @@ export function loadFBX (url) {
     });
 }
 
-export function loadJSON (url) {
+export function loadJSON (url: string) {
     return new Promise((resolve) => {
         fetch(url).then((response) => resolve(response.json()));
     });
 }
 
-export function loadObj (url) {
+export function loadObj (url: string) {
     return new Promise((resolve) => {
         const loader = new OBJLoader();
         loader.load(url, (fbx) => resolve(fbx));
