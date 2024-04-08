@@ -94,7 +94,7 @@
 		threeScene.dispose();
 	});
 
-	$: if (animtion_data && bones) {
+	$: if (animtion_data && bones && diva) {
 		current_pose = animtion_data.getFrameData();
 
 		for (const bone_name in current_pose) {
@@ -108,6 +108,21 @@
 				);
 			}
 		}
+
+		const bone_positions: { [key: string]: THREE.Vector3 } = {};
+
+		diva.traverse((node: THREE.Object3D) => {
+			// @ts-ignore
+			if (node.isBone) {
+				const v = new THREE.Vector3();
+
+				node.getWorldPosition(v);
+
+				bone_positions[node.name] = v;
+			}
+		});
+
+		skeleton.setBonePositions(bone_positions);
 	}
 
 	function setDivaOpacity(opacity: number): void {
