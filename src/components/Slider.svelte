@@ -1,24 +1,23 @@
 <script lang="ts">
-	import { onDestroy, onMount } from "svelte";
+	import { onDestroy, onMount, createEventDispatcher } from "svelte";
+
+	const dispatch = createEventDispatcher();
 
 	export let min_value: number;
 
 	export let max_value: number;
 
-	export let value: number;
+	export let initial_value: number;
+
+	let value: number = initial_value;
 
 	let slider_input: HTMLInputElement;
-
-	// output.innerHTML = slider.value; // Display the default slider value
-
-	// // Update the current slider value (each time you drag the slider handle)
-	// slider_input.oninput = function () {
-	// 	output.innerHTML = this.value;
-	// };
 
 	onMount(() => {
 		slider_input.oninput = (e: Event) => {
 			value = parseInt((e.target as HTMLInputElement).value);
+
+			dispatch("update", { value: value });
 		};
 	});
 

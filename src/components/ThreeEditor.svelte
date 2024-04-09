@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onDestroy, onMount } from "svelte";
+	import type { ComponentEvents } from "svelte";
 	import * as THREE from "three";
 	import Stats from "three/examples/jsm/libs/stats.module.js";
 
@@ -141,6 +142,10 @@
 		// add skeletion to scene
 		threeScene.scene.add(skeleton.mesh);
 	}
+
+	function frameUpdateCallback(event: ComponentEvents<Slider>["update"]) {
+		console.log(event);
+	}
 </script>
 
 <section>
@@ -150,7 +155,8 @@
 		<Slider
 			min_value={0}
 			max_value={total_frames}
-			bind:value={animtion_data.current_frame}
+			initial_value={0}
+			on:update={frameUpdateCallback}
 		/>
 	</div>
 </section>
