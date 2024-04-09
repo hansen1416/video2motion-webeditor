@@ -39,7 +39,7 @@ export default class Skeleton {
     ]
 
     constructor() {
-        this.mesh = this.init();
+        this.init();
     }
 
     init() {
@@ -49,7 +49,7 @@ export default class Skeleton {
         const instanceCount = this.bone_names.length;
 
         // Create the InstancedMesh
-        const instancedMesh = new THREE.InstancedMesh(geometry, material, instanceCount);
+        this.mesh = new THREE.InstancedMesh(geometry, material, instanceCount);
 
         const start_x = -1
 
@@ -59,21 +59,24 @@ export default class Skeleton {
 
             matrix.setPosition(start_x + i * 0.05, 0, 0);
 
-            instancedMesh.setMatrixAt(i, matrix)
+            this.mesh.setMatrixAt(i, matrix)
         }
 
-        return instancedMesh
+        this.mesh.instanceMatrix.needsUpdate = true;
     }
 
     setBonePositions(bone_positions: { [key: string]: THREE.Vector3 }) {
         this.bone_names.forEach((bone_name, i) => {
             const bone_position = bone_positions[bone_name];
+
             if (bone_position) {
                 const matrix = new THREE.Matrix4();
                 matrix.setPosition(bone_position);
                 this.mesh.setMatrixAt(i, matrix);
             }
         });
+
+        this.mesh.instanceMatrix.needsUpdate = true;
     }
 
 }
