@@ -4,12 +4,10 @@
 	import * as THREE from "three";
 	import Stats from "three/examples/jsm/libs/stats.module.js";
 
-	import Slider from "../components/Slider.svelte";
+	import FrameSlider from "./FrameSlider.svelte";
 	import ThreeScene from "../lib/ThreeScene";
-	import AnimationData, {
-		type AnimationDataObject,
-		type AnimationFrameDataObject,
-	} from "../lib/AnimationData";
+	import AnimationData from "../lib/AnimationData";
+	import type { AnimationDataObject } from "../lib/AnimationData";
 	import Skeleton from "../lib/Skeleton";
 	import { loadGLTF, loadJSON } from "../utils/ropes";
 
@@ -25,13 +23,13 @@
 
 	let total_frames = 0;
 
-	let current_pose: AnimationFrameDataObject = {};
-
 	let bones: { [key: string]: THREE.Object3D } = {};
 
 	let skeleton = new Skeleton();
 
 	let diva: THREE.Object3D;
+
+	let initial_frame = 0;
 
 	function animate() {
 		// update physics world and threejs renderer
@@ -82,9 +80,14 @@
 
 			total_frames = animtion_data.total_frames;
 
+			// initial frame
+			setBoneRotation(initial_frame);
+
+			setBonePosition();
+
 			setDivaOpacity(0.6);
 
-			addSkeleton();
+			threeScene.scene.add(skeleton.mesh);
 		});
 	});
 
@@ -95,8 +98,20 @@
 		threeScene.dispose();
 	});
 
-	$: if (animtion_data && bones && diva) {
-		current_pose = animtion_data.getFrameData();
+	function setDivaOpacity(opacity: number): void {
+		for (const child of diva.children) {
+			if (child instanceof THREE.SkinnedMesh === false) continue;
+
+			const mat = (child as THREE.SkinnedMesh)
+				.material as THREE.MeshStandardMaterial;
+
+			mat.transparent = true;
+			mat.opacity = opacity;
+		}
+	}
+
+	function setBoneRotation(frame_idx: number) {
+		const current_pose = animtion_data.getFrameData(frame_idx);
 
 		for (const bone_name in current_pose) {
 			const bone = bones[bone_name];
@@ -109,7 +124,9 @@
 				);
 			}
 		}
+	}
 
+	function setBonePosition() {
 		const bone_positions: { [key: string]: THREE.Vector3 } = {};
 
 		diva.traverse((node: THREE.Object3D) => {
@@ -126,25 +143,16 @@
 		skeleton.setBonePositions(bone_positions);
 	}
 
-	function setDivaOpacity(opacity: number): void {
-		for (const child of diva.children) {
-			if (child instanceof THREE.SkinnedMesh === false) continue;
-
-			const mat = (child as THREE.SkinnedMesh)
-				.material as THREE.MeshStandardMaterial;
-
-			mat.transparent = true;
-			mat.opacity = opacity;
+	function frameUpdateCallback(
+		event: ComponentEvents<FrameSlider>["update"],
+	) {
+		if (!animtion_data || !bones || !diva) {
+			return;
 		}
-	}
 
-	function addSkeleton() {
-		// add skeletion to scene
-		threeScene.scene.add(skeleton.mesh);
-	}
+		setBoneRotation(event.detail.frame_idx);
 
-	function frameUpdateCallback(event: ComponentEvents<Slider>["update"]) {
-		console.log(event);
+		setBonePosition();
 	}
 </script>
 
@@ -152,10 +160,10 @@
 	<canvas bind:this={canvas} />
 
 	<div class="control-box">
-		<Slider
+		<FrameSlider
 			min_value={0}
 			max_value={total_frames}
-			initial_value={0}
+			initial_value={initial_frame}
 			on:update={frameUpdateCallback}
 		/>
 	</div>

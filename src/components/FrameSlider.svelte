@@ -17,7 +17,7 @@
 		slider_input.oninput = (e: Event) => {
 			value = parseInt((e.target as HTMLInputElement).value);
 
-			dispatch("update", { value: value });
+			dispatch("update", { frame_idx: value });
 		};
 	});
 
