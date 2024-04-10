@@ -40,12 +40,12 @@
 			raycaster.setFromCamera(mouse, threeScene.camera);
 
 			const intersects = raycaster.intersectObjects(
-				threeScene.scene.children,
+				skeleton.group.children,
 				true,
 			);
 
 			if (intersects.length > 0) {
-				console.log(intersects);
+				console.log(intersects, intersects[0].object.name);
 			}
 
 			// update physics world and threejs renderer
@@ -105,7 +105,7 @@
 
 			setDivaOpacity(0.6);
 
-			threeScene.scene.add(skeleton.mesh);
+			threeScene.scene.add(skeleton.group);
 		});
 	});
 

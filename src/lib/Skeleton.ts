@@ -1,12 +1,8 @@
 import * as THREE from 'three';
 
-
 export default class Skeleton {
 
     group: THREE.Group = new THREE.Group();
-
-    mesh: THREE.InstancedMesh;
-
 
     bone_names: Array<string> = [
         "Hips",
@@ -40,40 +36,30 @@ export default class Skeleton {
 
     // todo need to use different geometry/mesh for each bone
     constructor() {
-        const geometry = new THREE.SphereGeometry(0.02, 32, 32);
-        const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
-        const instanceCount = this.bone_names.length;
+        for (let bone_name of this.bone_names) {
+            const geometry = new THREE.SphereGeometry(0.02, 32, 32);
+            const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
-        // Create the InstancedMesh
-        this.mesh = new THREE.InstancedMesh(geometry, material, instanceCount);
+            const mesh = new THREE.Mesh(geometry, material);
 
-        const start_x = -1
+            mesh.name = bone_name;
 
-        for (let i = 0; i < instanceCount; i++) {
-
-            const matrix = new THREE.Matrix4();
-
-            matrix.setPosition(start_x + i * 0.05, 0, 0);
-
-            this.mesh.setMatrixAt(i, matrix)
+            this.group.add(mesh);
         }
-
-        this.mesh.instanceMatrix.needsUpdate = true;
     }
 
     setBonePositions(bone_positions: { [key: string]: THREE.Vector3 }) {
-        this.bone_names.forEach((bone_name, i) => {
-            const bone_position = bone_positions[bone_name];
 
-            if (bone_position) {
-                const matrix = new THREE.Matrix4();
-                matrix.setPosition(bone_position);
-                this.mesh.setMatrixAt(i, matrix);
+
+        this.bone_names.forEach((bone_name, i) => {
+
+            const obj = this.group.getObjectByName(bone_name);
+
+            if (obj) {
+                obj.position.copy(bone_positions[bone_name]);
             }
         });
-
-        this.mesh.instanceMatrix.needsUpdate = true;
     }
 
 }
