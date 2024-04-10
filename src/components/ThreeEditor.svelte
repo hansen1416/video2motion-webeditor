@@ -31,10 +31,26 @@
 
 	let initial_frame = 0;
 
-	function animate() {
-		// update physics world and threejs renderer
-		threeScene.onFrameUpdate(stats);
+	const raycaster = new THREE.Raycaster();
 
+	const mouse = new THREE.Vector2();
+
+	function animate() {
+		if (threeScene) {
+			raycaster.setFromCamera(mouse, threeScene.camera);
+
+			const intersects = raycaster.intersectObjects(
+				threeScene.scene.children,
+				true,
+			);
+
+			if (intersects.length > 0) {
+				console.log(intersects);
+			}
+
+			// update physics world and threejs renderer
+			threeScene.onFrameUpdate(stats);
+		}
 		animation_pointer = requestAnimationFrame(animate);
 	}
 
@@ -44,6 +60,8 @@
 			document.documentElement.clientWidth,
 			document.documentElement.clientHeight,
 		);
+
+		canvas.addEventListener("mousemove", onMouseMove);
 
 		animate();
 
@@ -97,6 +115,13 @@
 
 		threeScene.dispose();
 	});
+
+	function onMouseMove(event: MouseEvent) {
+		event.preventDefault();
+
+		mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+		mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+	}
 
 	function setDivaOpacity(opacity: number): void {
 		for (const child of diva.children) {

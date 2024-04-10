@@ -38,11 +38,8 @@ export default class Skeleton {
         "RightToe_End"
     ]
 
+    // todo need to use different geometry/mesh for each bone
     constructor() {
-        this.init();
-    }
-
-    init() {
         const geometry = new THREE.SphereGeometry(0.02, 32, 32);
         const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
