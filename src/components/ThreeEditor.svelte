@@ -35,18 +35,16 @@
 
 	const mouse = new THREE.Vector2();
 
+	let intersects: THREE.Intersection[] = [];
+
 	function animate() {
 		if (threeScene) {
 			raycaster.setFromCamera(mouse, threeScene.camera);
 
-			const intersects = raycaster.intersectObjects(
+			intersects = raycaster.intersectObjects(
 				skeleton.group.children,
 				true,
 			);
-
-			if (intersects.length > 0) {
-				console.log(intersects, intersects[0].object.name);
-			}
 
 			// update physics world and threejs renderer
 			threeScene.onFrameUpdate(stats);
@@ -60,10 +58,6 @@
 			document.documentElement.clientWidth,
 			document.documentElement.clientHeight,
 		);
-
-		canvas.addEventListener("mousemove", onMouseMove);
-
-		animate();
 
 		Promise.all([
 			loadGLTF(`/glb/dors.glb`),
@@ -106,6 +100,11 @@
 			setDivaOpacity(0.6);
 
 			threeScene.scene.add(skeleton.group);
+
+			canvas.addEventListener("mousemove", onMouseMove);
+			canvas.addEventListener("click", onClick);
+
+			animate();
 		});
 	});
 
@@ -121,6 +120,27 @@
 
 		mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
 		mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+	}
+
+	function onClick(event: MouseEvent) {
+		event.preventDefault();
+
+		if (intersects.length === 0) {
+			return;
+		}
+
+		// selected bone
+		const bone = intersects[0].object;
+
+		console.log(bone);
+
+		// todo, add rotation, translation control
+	}
+
+	$: if (intersects.length > 0) {
+		skeleton.highlightBone(intersects[0].object.name);
+	} else {
+		skeleton.highlightBone("");
 	}
 
 	function setDivaOpacity(opacity: number): void {
