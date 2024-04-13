@@ -32,6 +32,8 @@ export default class Skeleton {
         "RightToe_End": 24
     };
 
+    bones: { [key: string]: THREE.Object3D } = {};
+
     scaled: number = -1;
 
     constructor() {
@@ -48,9 +50,22 @@ export default class Skeleton {
         }
     }
 
-    setBonePositions(bone_positions: { [key: string]: THREE.Vector3 }) {
-        Object.entries(this.bone_names).forEach(([bone_name, i]) => {
-            this.group.children[i].position.copy(bone_positions[bone_name]);
+    setBones(bones: { [key: string]: THREE.Object3D }) {
+        this.bones = bones;
+    }
+
+    updateBonePositions() {
+        Object.entries(this.bones).forEach(([bone_name, bone]) => {
+
+            if (!this.bone_names[bone_name]) {
+                return;
+            }
+
+            const v = new THREE.Vector3();
+
+            bone.getWorldPosition(v);
+
+            this.group.children[this.bone_names[bone_name]].position.copy(v);
         })
     }
 

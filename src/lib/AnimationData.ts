@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 export type QuaternionArray = [number, number, number, number];
 
 export type AnimationDataObject = { [key: string]: QuaternionArray[] };
@@ -6,15 +8,19 @@ export type AnimationFrameDataObject = { [key: string]: QuaternionArray }
 
 export default class AnimationData {
 
-    data: AnimationDataObject = {};
-
     total_frames: number = 0;
 
-    constructor(data: AnimationDataObject) {
-        this.loadData(data);
+    data: AnimationDataObject = {};
+
+    bones: { [key: string]: THREE.Object3D } = {};
+
+    constructor() {
+
     }
 
-    loadData(data: AnimationDataObject) {
+    loadData(data: AnimationDataObject, bones: { [key: string]: THREE.Object3D }) {
+
+        this.bones = bones;
 
         if (!data || !Object.keys(data).length) {
             return;
@@ -32,6 +38,30 @@ export default class AnimationData {
         }
 
         return frame_data;
+    }
+
+    applyRotation(frame_idx: number) {
+        let frame_data = this.getFrameData(frame_idx);
+
+        for (let key in frame_data) {
+            if (!this.bones[key]) {
+                continue;
+            }
+            this.bones[key].quaternion.fromArray(frame_data[key]);
+        }
+
+        // for (const bone_name in frame_data) {
+        // 	const bone = bones[bone_name];
+
+        // 	if (bone) {
+        // 		const [x, y, z, w] = frame_data[bone_name];
+
+        // 		bone.rotation.setFromQuaternion(
+        // 			new THREE.Quaternion(x, y, z, w),
+        // 		);
+        // 	}
+        // }
+
     }
 
 }

@@ -19,17 +19,17 @@
 
 	let animation_pointer = 0;
 
-	let animtion_data: AnimationData = new AnimationData({});
-
 	let total_frames = 0;
+
+	let initial_frame = 0;
+
+	let animtionData: AnimationData = new AnimationData();
 
 	let bones: { [key: string]: THREE.Object3D } = {};
 
 	let skeleton = new Skeleton();
 
 	let diva: THREE.Object3D;
-
-	let initial_frame = 0;
 
 	const raycaster = new THREE.Raycaster();
 
@@ -88,18 +88,20 @@
 				}
 			});
 
-			animtion_data.loadData(anim_data as AnimationDataObject);
+			threeScene.scene.add(skeleton.group);
 
-			total_frames = animtion_data.total_frames;
+			animtionData.loadData(anim_data as AnimationDataObject, bones);
+
+			total_frames = animtionData.total_frames;
 
 			// initial frame
-			setBoneRotation(initial_frame);
+			animtionData.applyRotation(initial_frame);
 
-			setBonePosition();
+			skeleton.setBones(bones);
+
+			skeleton.updateBonePositions();
 
 			setDivaOpacity(0.6);
-
-			threeScene.scene.add(skeleton.group);
 
 			canvas.addEventListener("mousemove", onMouseMove);
 			canvas.addEventListener("click", onClick);
@@ -155,49 +157,16 @@
 		}
 	}
 
-	function setBoneRotation(frame_idx: number) {
-		const current_pose = animtion_data.getFrameData(frame_idx);
-
-		for (const bone_name in current_pose) {
-			const bone = bones[bone_name];
-
-			if (bone) {
-				const [x, y, z, w] = current_pose[bone_name];
-
-				bone.rotation.setFromQuaternion(
-					new THREE.Quaternion(x, y, z, w),
-				);
-			}
-		}
-	}
-
-	function setBonePosition() {
-		const bone_positions: { [key: string]: THREE.Vector3 } = {};
-
-		diva.traverse((node: THREE.Object3D) => {
-			// @ts-ignore
-			if (node.isBone) {
-				const v = new THREE.Vector3();
-
-				node.getWorldPosition(v);
-
-				bone_positions[node.name] = v;
-			}
-		});
-
-		skeleton.setBonePositions(bone_positions);
-	}
-
 	function frameUpdateCallback(
 		event: ComponentEvents<FrameSlider>["update"],
 	) {
-		if (!animtion_data || !bones || !diva) {
+		if (!animtionData || !bones || !diva) {
 			return;
 		}
 
-		setBoneRotation(event.detail.frame_idx);
+		animtionData.applyRotation(event.detail.frame_idx);
 
-		setBonePosition();
+		skeleton.updateBonePositions();
 	}
 </script>
 
