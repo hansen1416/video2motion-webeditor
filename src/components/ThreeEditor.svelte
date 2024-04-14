@@ -10,6 +10,7 @@
 	import AnimationData from "../lib/AnimationData";
 	import type { AnimationDataObject } from "../lib/AnimationData";
 	import Skeleton from "../lib/Skeleton";
+	import { RotationControl, TranslationControl } from "../lib/Controls";
 	import { loadGLTF, loadJSON } from "../utils/ropes";
 	import { displayScene } from "../store";
 
@@ -29,8 +30,6 @@
 
 	let bones: { [key: string]: THREE.Object3D } = {};
 
-	let skeleton = new Skeleton();
-
 	let diva: THREE.Object3D;
 
 	const raycaster = new THREE.Raycaster();
@@ -38,6 +37,10 @@
 	const mouse = new THREE.Vector2();
 
 	let intersects: THREE.Intersection[] = [];
+
+	let skeleton = new Skeleton();
+	let rotationControl = new RotationControl();
+	let translationControl = new TranslationControl();
 
 	function animate() {
 		if (threeScene) {
@@ -95,7 +98,10 @@
 				}
 			});
 
+			// add the controls we need
 			threeScene.scene.add(skeleton.group);
+			threeScene.scene.add(rotationControl.group);
+			threeScene.scene.add(translationControl.group);
 
 			// initial animation data begin
 			animtionData.loadData(anim_data as AnimationDataObject, bones);
@@ -144,7 +150,7 @@
 		// selected bone
 		const bone = intersects[0].object;
 
-		console.log(bone);
+		rotationControl.group.position.copy(bone.position);
 
 		// todo, add rotation, translation control
 	}
