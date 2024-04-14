@@ -1,12 +1,31 @@
 import * as THREE from 'three';
 
-export default class RotationControl {
+const RADIUS = 0.3;
+
+abstract class BaseControl {
 
     group: THREE.Group = new THREE.Group();
 
-    RADIUS = 0.3;
+    constructor() {
+
+        this.hide();
+    }
+
+    hide() {
+        this.group.position.set(-1000, -1000, -1000);
+    }
+
+    show() {
+        this.group.position.set(0, 0, 0);
+    }
+}
+
+export class RotationControl extends BaseControl {
 
     constructor() {
+
+        super();
+
         this.init();
     }
 
@@ -29,7 +48,7 @@ export default class RotationControl {
      * @returns 
      */
     createSphere(): THREE.Mesh {
-        const geometry = new THREE.SphereGeometry(this.RADIUS, 64, 64);
+        const geometry = new THREE.SphereGeometry(RADIUS, 64, 64);
         const material = new THREE.MeshBasicMaterial({
             color: 0xffff00, transparent: true, opacity: 0.5
         });
@@ -42,7 +61,7 @@ export default class RotationControl {
 
         // Create a path object
         const path = new THREE.Path();
-        path.absarc(0, 0, this.RADIUS, 0, Math.PI * 2); // Full circle
+        path.absarc(0, 0, RADIUS, 0, Math.PI * 2); // Full circle
 
         // Set the number of points for the line (more points, smoother circle)
         const points = path.getPoints(64);
@@ -56,7 +75,8 @@ export default class RotationControl {
         // Create the line object
         return new THREE.LineLoop(lineGeometry, material);
     }
+}
 
-
+export class TranslationControl extends BaseControl {
 
 }

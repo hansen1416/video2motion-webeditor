@@ -97,6 +97,7 @@
 
 			threeScene.scene.add(skeleton.group);
 
+			// initial animation data begin
 			animtionData.loadData(anim_data as AnimationDataObject, bones);
 
 			total_frames = animtionData.total_frames;
@@ -107,6 +108,7 @@
 			skeleton.setBones(bones);
 
 			skeleton.updateBonePositions();
+			// initial animation data end
 
 			canvas.addEventListener("mousemove", onMouseMove);
 			canvas.addEventListener("click", onClick);
@@ -159,11 +161,11 @@
 		}
 
 		if (value === "skeleton") {
-			skeleton.setVisibility(true);
+			skeleton.show();
 
 			_setDivaOpacity(0.6);
 		} else {
-			skeleton.setVisibility(false);
+			skeleton.hide();
 
 			_setDivaOpacity(1);
 		}

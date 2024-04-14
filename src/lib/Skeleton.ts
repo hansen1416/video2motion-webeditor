@@ -51,7 +51,7 @@ export default class Skeleton {
             this.group.add(mesh);
         }
 
-        this.group.visible = false;
+        this.hide()
     }
 
     setBones(bones: { [key: string]: THREE.Object3D }) {
@@ -100,8 +100,13 @@ export default class Skeleton {
         })
     }
 
-    setVisibility(visible: boolean) {
-        this.group.visible = visible;
-        this.visible = visible;
+    hide() {
+        this.group.position.set(-1000, -1000, -1000);
+        this.visible = false;
+    }
+
+    show() {
+        this.group.position.set(0, 0, 0);
+        this.visible = true;
     }
 }
