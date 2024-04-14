@@ -11,6 +11,7 @@
 	import type { AnimationDataObject } from "../lib/AnimationData";
 	import Skeleton from "../lib/Skeleton";
 	import { loadGLTF, loadJSON } from "../utils/ropes";
+	import { displayScene } from "../store";
 
 	let canvas: HTMLCanvasElement;
 
@@ -78,6 +79,11 @@
 				// @ts-ignore
 				if (node.isMesh) {
 					node.castShadow = true;
+
+					const mat = (node as THREE.SkinnedMesh)
+						.material as THREE.MeshStandardMaterial;
+
+					mat.transparent = true;
 				}
 				// @ts-ignore
 				if (node.isBone) {
@@ -101,8 +107,6 @@
 			skeleton.setBones(bones);
 
 			skeleton.updateBonePositions();
-
-			setDivaOpacity(0.6);
 
 			canvas.addEventListener("mousemove", onMouseMove);
 			canvas.addEventListener("click", onClick);
@@ -146,6 +150,22 @@
 		skeleton.highlightBone("");
 	}
 
+	displayScene.subscribe((value) => {
+		if (!threeScene) {
+			return;
+		}
+
+		if (value === "skeleton") {
+			skeleton.setVisibility(true);
+
+			setDivaOpacity(0.6);
+		} else {
+			skeleton.setVisibility(false);
+
+			setDivaOpacity(1);
+		}
+	});
+
 	function setDivaOpacity(opacity: number): void {
 		for (const child of diva.children) {
 			if (child instanceof THREE.SkinnedMesh === false) continue;
@@ -153,7 +173,6 @@
 			const mat = (child as THREE.SkinnedMesh)
 				.material as THREE.MeshStandardMaterial;
 
-			mat.transparent = true;
 			mat.opacity = opacity;
 		}
 	}

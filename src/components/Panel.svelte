@@ -1,14 +1,23 @@
 <script lang="ts">
-	import { onDestroy, onMount } from "svelte";
-	import type { ComponentEvents } from "svelte";
-	import * as THREE from "three";
-
 	import Icon from "../icons/Icon.svelte";
+	import { displayScene } from "../store";
 </script>
 
 <section class="panel">
-	<Icon name="bones" />
-	<Icon name="mesh" />
+	<button
+		on:click={() => {
+			displayScene.set("skeleton");
+		}}
+	>
+		<Icon name="bones" />
+	</button>
+	<button
+		on:click={() => {
+			displayScene.set("mesh");
+		}}
+	>
+		<Icon name="mesh" />
+	</button>
 	<Icon name="axis" />
 	<Icon name="rotate" />
 </section>

@@ -36,6 +36,8 @@ export default class Skeleton {
 
     scaled: number = -1;
 
+    visible = false;
+
     constructor() {
 
         for (let bone_name in this.bone_names) {
@@ -48,6 +50,8 @@ export default class Skeleton {
 
             this.group.add(mesh);
         }
+
+        this.group.visible = false;
     }
 
     setBones(bones: { [key: string]: THREE.Object3D }) {
@@ -94,6 +98,10 @@ export default class Skeleton {
                 this.group.children[i].scale.z = 1;
             }
         })
+    }
 
+    setVisibility(visible: boolean) {
+        this.group.visible = visible;
+        this.visible = visible;
     }
 }
