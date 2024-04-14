@@ -5,6 +5,7 @@
 	import Stats from "three/examples/jsm/libs/stats.module.js";
 
 	import FrameSlider from "./FrameSlider.svelte";
+	import Panel from "./Panel.svelte";
 	import ThreeScene from "../lib/ThreeScene";
 	import AnimationData from "../lib/AnimationData";
 	import type { AnimationDataObject } from "../lib/AnimationData";
@@ -170,7 +171,7 @@
 	}
 </script>
 
-<section>
+<section class="three-editor">
 	<canvas bind:this={canvas} />
 
 	<div class="control-box">
@@ -181,6 +182,8 @@
 			on:update={frameUpdateCallback}
 		/>
 	</div>
+
+	<Panel />
 </section>
 
 <style>
