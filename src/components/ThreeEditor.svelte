@@ -122,6 +122,9 @@
 		threeScene.dispose();
 	});
 
+	/**
+	 * mouse position for interactions
+	 */
 	function onMouseMove(event: MouseEvent) {
 		event.preventDefault();
 
@@ -158,15 +161,15 @@
 		if (value === "skeleton") {
 			skeleton.setVisibility(true);
 
-			setDivaOpacity(0.6);
+			_setDivaOpacity(0.6);
 		} else {
 			skeleton.setVisibility(false);
 
-			setDivaOpacity(1);
+			_setDivaOpacity(1);
 		}
 	});
 
-	function setDivaOpacity(opacity: number): void {
+	function _setDivaOpacity(opacity: number): void {
 		for (const child of diva.children) {
 			if (child instanceof THREE.SkinnedMesh === false) continue;
 
@@ -177,6 +180,10 @@
 		}
 	}
 
+	/**
+	 * update frame callback, set bone rotations and positions
+	 * @param event
+	 */
 	function frameUpdateCallback(
 		event: ComponentEvents<FrameSlider>["update"],
 	) {
