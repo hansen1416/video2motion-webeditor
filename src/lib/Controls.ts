@@ -15,8 +15,8 @@ abstract class BaseControl {
         this.group.position.set(-1000, -1000, -1000);
     }
 
-    show() {
-        this.group.position.set(0, 0, 0);
+    show(position: THREE.Vector3) {
+        this.group.position.copy(position);
     }
 }
 
@@ -78,5 +78,24 @@ export class RotationControl extends BaseControl {
 }
 
 export class TranslationControl extends BaseControl {
+    constructor() {
 
+        super();
+
+        this.init();
+    }
+
+    init() {
+        const xaxis = this._axis(new THREE.Vector3(1, 0, 0), 0xff0000);
+        const yaxis = this._axis(new THREE.Vector3(0, 1, 0), 0x00ff00);
+        const zaxis = this._axis(new THREE.Vector3(0, 0, 1), 0x0000ff);
+
+        this.group.add(xaxis);
+        this.group.add(yaxis);
+        this.group.add(zaxis);
+    }
+
+    _axis(dir = new THREE.Vector3(1, 0, 0), color = 0xff0000) {
+        return new THREE.ArrowHelper(dir, new THREE.Vector3(0, 0, 0), RADIUS, color);
+    }
 }

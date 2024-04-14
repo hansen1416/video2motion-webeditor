@@ -12,7 +12,7 @@
 	import Skeleton from "../lib/Skeleton";
 	import { RotationControl, TranslationControl } from "../lib/Controls";
 	import { loadGLTF, loadJSON } from "../utils/ropes";
-	import { displayScene } from "../store";
+	import { displayScene, controlType } from "../store";
 
 	let canvas: HTMLCanvasElement;
 
@@ -41,6 +41,8 @@
 	let skeleton = new Skeleton();
 	let rotationControl = new RotationControl();
 	let translationControl = new TranslationControl();
+
+	let control_type: "rotation" | "translation" = "rotation";
 
 	function animate() {
 		if (threeScene) {
@@ -150,7 +152,13 @@
 		// selected bone
 		const bone = intersects[0].object;
 
-		rotationControl.group.position.copy(bone.position);
+		if (control_type === "rotation") {
+			rotationControl.show(bone.position);
+			translationControl.hide();
+		} else if (control_type === "translation") {
+			translationControl.show(bone.position);
+			rotationControl.hide();
+		}
 
 		// todo, add rotation, translation control
 	}
@@ -175,6 +183,12 @@
 
 			_setDivaOpacity(1);
 		}
+	});
+
+	controlType.subscribe((value) => {
+		control_type = value as "rotation" | "translation";
+
+		// todo check if the bone is selected, if yes, switch the control
 	});
 
 	function _setDivaOpacity(opacity: number): void {

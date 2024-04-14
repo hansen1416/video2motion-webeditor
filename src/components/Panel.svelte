@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Icon from "../icons/Icon.svelte";
-	import { displayScene } from "../store";
+	import { displayScene, controlType } from "../store";
 </script>
 
 <section class="panel">
@@ -18,8 +18,20 @@
 	>
 		<Icon name="mesh" />
 	</button>
-	<Icon name="axis" />
-	<Icon name="rotate" />
+	<button
+		on:click={() => {
+			controlType.set("translation");
+		}}
+	>
+		<Icon name="axis" />
+	</button>
+	<button
+		on:click={() => {
+			controlType.set("rotation");
+		}}
+	>
+		<Icon name="rotate" />
+	</button>
 </section>
 
 <style>
