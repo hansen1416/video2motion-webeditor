@@ -1,6 +1,16 @@
 <script lang="ts">
+	import { controlType } from "../store";
+
 	export let size: number = 24;
 	export let color: string = "#fff";
+
+	controlType.subscribe((value) => {
+		if (value === "translation") {
+			color = "#ccc";
+		} else {
+			color = "#fff";
+		}
+	});
 </script>
 
 <svg

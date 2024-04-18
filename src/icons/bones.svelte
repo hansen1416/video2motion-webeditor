@@ -1,6 +1,16 @@
 <script lang="ts">
+	import { displayScene } from "../store";
+
 	export let size: number = 24;
 	export let color: string = "#fff";
+
+	displayScene.subscribe((value) => {
+		if (value === "mesh") {
+			color = "#ccc";
+		} else {
+			color = "#fff";
+		}
+	});
 </script>
 
 <svg
