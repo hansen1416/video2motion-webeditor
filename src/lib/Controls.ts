@@ -1,4 +1,7 @@
 import * as THREE from 'three';
+import { Line2 } from 'three/examples/jsm/lines/Line2.js';
+import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
+import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js';
 
 const RADIUS = 0.3;
 
@@ -12,7 +15,7 @@ abstract class BaseControl {
     }
 
     hide() {
-        this.group.position.set(-1000, -1000, -1000);
+        this.group.position.set(0.3, 0.3, 0.3);
     }
 
     show(position: THREE.Vector3) {
@@ -30,50 +33,53 @@ export class RotationControl extends BaseControl {
     }
 
     init() {
-        this.group.add(this.createSphere());
 
         const xaxis = this.createCircle(0xff0000);
         // xaxis.rotation.y = Math.PI / 2;
+
         const yaxis = this.createCircle(0x00ff00);
         // yaxis.rotation.x = Math.PI / 2;
+
         const zaxis = this.createCircle(0x0000ff);
         // zaxis.rotation.z = Math.PI / 2;
+
         this.group.add(xaxis);
         this.group.add(yaxis);
         this.group.add(zaxis);
     }
 
+
     /**
-     * create a sphere
+     * 
+     * @param color 
      * @returns 
      */
-    createSphere(): THREE.Mesh {
-        const geometry = new THREE.SphereGeometry(RADIUS, 64, 64);
-        const material = new THREE.MeshBasicMaterial({
-            color: 0xffff00, transparent: true, opacity: 0.5
+    createCircle(color: number): Line2 {
+
+
+        const positions = [0, 0, 0, 0.1, 0.1, 0.1]
+
+
+        const geometry = new LineGeometry();
+        geometry.setPositions(positions);
+
+        const matLine = new LineMaterial({
+
+            color: 0xffffff,
+            linewidth: 0.01, // in world units with size attenuation, pixels otherwise
+            vertexColors: true,
+
+            //resolution:  // to be set by renderer, eventually
+            dashed: false,
+            alphaToCoverage: true,
+
         });
-        const sphere = new THREE.Mesh(geometry, material);
 
-        return sphere;
-    }
+        const line = new Line2(geometry, matLine);
+        line.computeLineDistances();
 
-    createCircle(color = 0xffffff): THREE.LineLoop {
+        return line;
 
-        // Create a path object
-        const path = new THREE.Path();
-        path.absarc(0, 0, RADIUS, 0, Math.PI * 2); // Full circle
-
-        // Set the number of points for the line (more points, smoother circle)
-        const points = path.getPoints(64);
-
-        // Create a BufferGeometry from the points
-        const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
-
-        // Create a material for the line (adjust color as needed)
-        const material = new THREE.LineBasicMaterial({ color: color });
-
-        // Create the line object
-        return new THREE.LineLoop(lineGeometry, material);
     }
 }
 

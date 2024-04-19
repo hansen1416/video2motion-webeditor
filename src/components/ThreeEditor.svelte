@@ -12,7 +12,7 @@
 	import Skeleton from "../lib/Skeleton";
 	import { RotationControl, TranslationControl } from "../lib/Controls";
 	import { loadGLTF, loadJSON } from "../utils/ropes";
-	import { displayScene, controlType } from "../store";
+	import { display_scene, control_type } from "../store";
 
 	let canvas: HTMLCanvasElement;
 
@@ -42,7 +42,7 @@
 	let rotationControl = new RotationControl();
 	let translationControl = new TranslationControl();
 
-	let control_type: "rotation" | "translation" = "rotation";
+	let _control_type: "rotation" | "translation" = "rotation";
 
 	function animate() {
 		if (threeScene) {
@@ -122,6 +122,19 @@
 			canvas.addEventListener("click", onClick);
 
 			animate();
+
+			// this subscribe must happen after the scene is loaded
+			display_scene.subscribe((value) => {
+				if (value === "skeleton") {
+					skeleton.show();
+
+					_setDivaOpacity(0.6);
+				} else {
+					skeleton.hide();
+
+					_setDivaOpacity(1);
+				}
+			});
 		});
 	});
 
@@ -152,10 +165,10 @@
 		// selected bone
 		const bone = intersects[0].object;
 
-		if (control_type === "rotation") {
+		if (_control_type === "rotation") {
 			rotationControl.show(bone.position);
 			translationControl.hide();
-		} else if (control_type === "translation") {
+		} else if (_control_type === "translation") {
 			translationControl.show(bone.position);
 			rotationControl.hide();
 		}
@@ -169,24 +182,8 @@
 		skeleton.highlightBone("");
 	}
 
-	displayScene.subscribe((value) => {
-		if (!threeScene) {
-			return;
-		}
-
-		if (value === "skeleton") {
-			skeleton.show();
-
-			_setDivaOpacity(0.6);
-		} else {
-			skeleton.hide();
-
-			_setDivaOpacity(1);
-		}
-	});
-
-	controlType.subscribe((value) => {
-		control_type = value as "rotation" | "translation";
+	control_type.subscribe((value) => {
+		_control_type = value as "rotation" | "translation";
 
 		// todo check if the bone is selected, if yes, switch the control
 	});

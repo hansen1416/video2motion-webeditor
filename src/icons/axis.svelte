@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { controlType } from "../store";
+	import { control_type } from "../store";
 
 	export let size: number = 24;
 	export let color: string = "#fff";
 
-	controlType.subscribe((value) => {
+	control_type.subscribe((value) => {
 		if (value === "translation") {
-			color = "#fff";
-		} else {
 			color = "#ccc";
+		} else {
+			color = "#fff";
 		}
 	});
 </script>

@@ -1,33 +1,38 @@
 <script lang="ts">
 	import Icon from "../icons/Icon.svelte";
-	import { displayScene, controlType } from "../store";
+	import { display_scene, control_type } from "../store";
+	import WebStorage from "../lib/WebStorage";
 </script>
 
 <section class="panel">
 	<button
 		on:click={() => {
-			displayScene.set("skeleton");
+			display_scene.set("skeleton");
+			WebStorage.save("display_scene", "skeleton");
 		}}
 	>
 		<Icon name="bones" />
 	</button>
 	<button
 		on:click={() => {
-			displayScene.set("mesh");
+			display_scene.set("mesh");
+			WebStorage.save("display_scene", "mesh");
 		}}
 	>
 		<Icon name="mesh" />
 	</button>
 	<button
 		on:click={() => {
-			controlType.set("translation");
+			control_type.set("translation");
+			WebStorage.save("control_type", "translation");
 		}}
 	>
 		<Icon name="axis" />
 	</button>
 	<button
 		on:click={() => {
-			controlType.set("rotation");
+			control_type.set("rotation");
+			WebStorage.save("control_type", "rotation");
 		}}
 	>
 		<Icon name="rotate" />
