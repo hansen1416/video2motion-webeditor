@@ -162,14 +162,18 @@
 			return;
 		}
 
-		// selected bone
-		const bone = intersects[0].object;
+		// selected bone joints
+		const joint = intersects[0].object;
+
+		const bone = bones[joint.name];
 
 		if (_control_type === "rotation") {
-			rotationControl.show(bone.position);
+			rotationControl.setBone(bone);
+
 			translationControl.hide();
 		} else if (_control_type === "translation") {
-			translationControl.show(bone.position);
+			translationControl.setBone(bone);
+
 			rotationControl.hide();
 		}
 
@@ -213,6 +217,10 @@
 		animtionData.applyRotation(event.detail.frame_idx);
 
 		skeleton.updateBonePositions();
+
+		rotationControl.update();
+
+		translationControl.update();
 	}
 </script>
 

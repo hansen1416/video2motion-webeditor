@@ -9,6 +9,8 @@ abstract class BaseControl {
 
     group: THREE.Group = new THREE.Group();
 
+    bone: THREE.Object3D | null = null;
+
     constructor() {
 
         this.hide();
@@ -18,9 +20,22 @@ abstract class BaseControl {
         this.group.visible = false;
     }
 
-    show(position: THREE.Vector3) {
-        this.group.position.copy(position);
+    show() {
         this.group.visible = true;
+    }
+
+    setBone(bone: THREE.Object3D) {
+        this.bone = bone;
+
+        this.update();
+        this.show()
+    }
+
+    update() {
+        if (this.bone) {
+            this.group.position.copy(this.bone.getWorldPosition(new THREE.Vector3()));
+            this.group.rotation.copy(this.bone.rotation);
+        }
     }
 }
 
