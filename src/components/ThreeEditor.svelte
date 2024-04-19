@@ -149,6 +149,8 @@
 			return;
 		}
 
+		// intersection[0].instanceId;
+
 		// selected bone
 		const bone = intersects[0].object;
 
