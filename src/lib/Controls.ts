@@ -3,7 +3,7 @@ import { Line2 } from 'three/examples/jsm/lines/Line2.js';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js';
 
-const RADIUS = 0.3;
+
 
 abstract class BaseControl {
 
@@ -15,15 +15,32 @@ abstract class BaseControl {
     }
 
     hide() {
-        this.group.position.set(0.3, 0.3, 0.3);
+        this.group.visible = false;
     }
 
     show(position: THREE.Vector3) {
         this.group.position.copy(position);
+        this.group.visible = true;
     }
 }
 
+function samplePointsOnCircle(radius: number, numPoints: number) {
+    const points = [];
+    const angleStep = (Math.PI * 2) / numPoints;
+
+    for (let i = 0; i < numPoints; i++) {
+        const angle = i * angleStep;
+        const x = radius * Math.cos(angle);
+        const y = radius * Math.sin(angle);
+        points.push(new THREE.Vector3(x, y, 0)); // Adjust z-coordinate if needed
+    }
+
+    return points;
+}
+
 export class RotationControl extends BaseControl {
+
+    radius: number = 0.2
 
     constructor() {
 
@@ -35,13 +52,13 @@ export class RotationControl extends BaseControl {
     init() {
 
         const xaxis = this.createCircle(0xff0000);
-        // xaxis.rotation.y = Math.PI / 2;
+        xaxis.rotation.y = Math.PI / 2;
 
         const yaxis = this.createCircle(0x00ff00);
-        // yaxis.rotation.x = Math.PI / 2;
+        yaxis.rotation.x = Math.PI / 2;
 
         const zaxis = this.createCircle(0x0000ff);
-        // zaxis.rotation.z = Math.PI / 2;
+        zaxis.rotation.z = Math.PI / 2;
 
         this.group.add(xaxis);
         this.group.add(yaxis);
@@ -56,8 +73,13 @@ export class RotationControl extends BaseControl {
      */
     createCircle(color: number): Line2 {
 
+        // get points from a circle
+        const points = samplePointsOnCircle(this.radius, 100);
+        const positions: Array<number> = []
 
-        const positions = [0, 0, 0, 0.1, 0.1, 0.1]
+        for (let i = 0; i < points.length; i++) {
+            positions.push(points[i].x, points[i].y, points[i].z);
+        }
 
 
         const geometry = new LineGeometry();
@@ -65,14 +87,13 @@ export class RotationControl extends BaseControl {
 
         const matLine = new LineMaterial({
 
-            color: 0xffffff,
-            linewidth: 0.01, // in world units with size attenuation, pixels otherwise
-            vertexColors: true,
+            color: color,
+            linewidth: 0.003, // in world units with size attenuation, pixels otherwise
+            // vertexColors: true,
 
             //resolution:  // to be set by renderer, eventually
             dashed: false,
             alphaToCoverage: true,
-
         });
 
         const line = new Line2(geometry, matLine);
@@ -84,6 +105,9 @@ export class RotationControl extends BaseControl {
 }
 
 export class TranslationControl extends BaseControl {
+
+    size: number = 0.3
+
     constructor() {
 
         super();
@@ -102,6 +126,6 @@ export class TranslationControl extends BaseControl {
     }
 
     _axis(dir = new THREE.Vector3(1, 0, 0), color = 0xff0000) {
-        return new THREE.ArrowHelper(dir, new THREE.Vector3(0, 0, 0), RADIUS, color);
+        return new THREE.ArrowHelper(dir, new THREE.Vector3(0, 0, 0), this.size, color);
     }
 }
