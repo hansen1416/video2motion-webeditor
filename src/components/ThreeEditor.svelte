@@ -197,14 +197,14 @@
 		const intersection = getNamedIntersects(intersects);
 
 		if (intersection) {
-			console.log();
-
-			skeleton.highlightBone(intersection.object.name);
+			skeleton.highlightBone(
+				skeleton.getBoneIndex(intersection.object.name),
+			);
 		} else {
-			skeleton.highlightBone("");
+			skeleton.highlightBone(-1);
 		}
 	} else {
-		skeleton.highlightBone("");
+		skeleton.highlightBone(-1);
 	}
 
 	control_type.subscribe((value: "rotation" | "translation") => {
