@@ -11,8 +11,13 @@
 	import type { AnimationDataObject } from "../lib/AnimationData";
 	import Skeleton from "../lib/Skeleton";
 	import { RotationControl, TranslationControl } from "../lib/Controls";
-	import { loadGLTF, loadJSON } from "../utils/ropes";
 	import { display_scene, control_type } from "../store";
+	import {
+		loadGLTF,
+		loadJSON,
+		getNamedIntersects,
+		setMeshOpacity,
+	} from "../utils/ropes";
 
 	let canvas: HTMLCanvasElement;
 
@@ -132,11 +137,11 @@
 				if (value === "skeleton") {
 					skeleton.show();
 
-					_setDivaOpacity(0.6);
+					setMeshOpacity(diva, 0.6);
 				} else {
 					skeleton.hide();
 
-					_setDivaOpacity(1);
+					setMeshOpacity(diva, 1);
 				}
 			});
 		});
@@ -162,35 +167,42 @@
 	function onClick(event: MouseEvent) {
 		event.preventDefault();
 
-		if (intersects.length === 0) {
+		//
+		const intersection = getNamedIntersects(intersects);
+
+		if (intersection === null) {
 			return;
 		}
 
 		// selected bone joints
-		const selectedBone = bones[intersects[0].object.name];
+		const selectedBone = bones[intersection.object.name];
 
 		rotationControl.setBone(selectedBone);
 		translationControl.setBone(selectedBone);
 
 		if (_control_type === "rotation") {
+			rotationControl.update();
 			rotationControl.show();
 			translationControl.hide();
 		} else if (_control_type === "translation") {
 			translationControl.show();
+			rotationControl.update();
 			rotationControl.hide();
 		}
 	}
 
 	$: if (intersects.length > 0) {
 		// todo coulod be bones, rotations, translations
-		// const names = [];
-		// for (const intersect of intersects) {
-		// 	names.push(intersect.object.name);
-		// }
-		// console.log(names);
-		// skeleton.highlightBone(intersects[0].object.name);
+
+		const intersection = getNamedIntersects(intersects);
+
+		if (intersection) {
+			skeleton.highlightBone(intersection.object.name);
+		} else {
+			skeleton.highlightBone("");
+		}
 	} else {
-		// skeleton.highlightBone("");
+		skeleton.highlightBone("");
 	}
 
 	control_type.subscribe((value: "rotation" | "translation") => {
@@ -206,17 +218,6 @@
 
 		// todo check if the bone is selected, if yes, switch the control
 	});
-
-	function _setDivaOpacity(opacity: number): void {
-		for (const child of diva.children) {
-			if (child instanceof THREE.SkinnedMesh === false) continue;
-
-			const mat = (child as THREE.SkinnedMesh)
-				.material as THREE.MeshStandardMaterial;
-
-			mat.opacity = opacity;
-		}
-	}
 
 	/**
 	 * update frame callback, set bone rotations and positions
