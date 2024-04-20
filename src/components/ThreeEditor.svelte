@@ -197,6 +197,8 @@
 		const intersection = getNamedIntersects(intersects);
 
 		if (intersection) {
+			console.log();
+
 			skeleton.highlightBone(intersection.object.name);
 		} else {
 			skeleton.highlightBone("");

@@ -58,10 +58,14 @@ export default class Skeleton {
         this.bones = bones;
     }
 
+    getBoneIndex(bone_name: string) {
+        return this.bone_names[bone_name];
+    }
+
     updateBonePositions() {
         Object.entries(this.bones).forEach(([bone_name, bone]) => {
 
-            if (!this.bone_names[bone_name]) {
+            if (!this.getBoneIndex(bone_name)) {
                 return;
             }
 
@@ -69,7 +73,7 @@ export default class Skeleton {
 
             bone.getWorldPosition(v);
 
-            this.group.children[this.bone_names[bone_name]].position.copy(v);
+            this.group.children[this.getBoneIndex(bone_name)].position.copy(v);
         })
     }
 
@@ -79,7 +83,7 @@ export default class Skeleton {
             return;
         }
         // If the bone is already scaled, do nothing
-        if (this.scaled === this.bone_names[bone_name]) {
+        if (this.scaled === this.getBoneIndex(bone_name)) {
             return;
         }
 
