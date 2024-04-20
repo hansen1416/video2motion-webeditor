@@ -196,6 +196,7 @@
 
 		if (intersection) {
 			// todo could be bones, rotations, translations
+			console.log(intersection.object.name);
 
 			skeleton.highlightBone(
 				skeleton.getBoneIndex(intersection.object.name),

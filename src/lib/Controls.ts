@@ -70,13 +70,13 @@ export class RotationControl extends BaseControl {
 
     init() {
 
-        const xaxis = this._circle(0xff0000, "xrotation");
+        const xaxis = this._circle(0xff0000, "rotation_x");
         xaxis.rotation.y = Math.PI / 2;
 
-        const yaxis = this._circle(0x00ff00, "yrotation");
+        const yaxis = this._circle(0x00ff00, "rotation_y");
         yaxis.rotation.x = Math.PI / 2;
 
-        const zaxis = this._circle(0x0000ff, "zrotation");
+        const zaxis = this._circle(0x0000ff, "rotation_z");
         zaxis.rotation.z = Math.PI / 2;
 
         this.group.add(xaxis);
@@ -136,19 +136,54 @@ export class TranslationControl extends BaseControl {
     }
 
     init() {
-        const xaxis = this._axis(new THREE.Vector3(1, 0, 0), 0xff0000, "xaxis");
-        const yaxis = this._axis(new THREE.Vector3(0, 1, 0), 0x00ff00, "yaxis");
-        const zaxis = this._axis(new THREE.Vector3(0, 0, 1), 0x0000ff, "zaxis");
+        const xaxis = this._axis(0xff0000, "translation_x");
+        xaxis.rotation.z = -Math.PI / 2;
+
+        const yaxis = this._axis(0x00ff00, "translation_y");
+        // yaxis.rotation.x = Math.PI / 2;
+
+        const zaxis = this._axis(0x0000ff, "translation_z");
+        zaxis.rotation.x = Math.PI / 2;
 
         this.group.add(xaxis);
         this.group.add(yaxis);
         this.group.add(zaxis);
     }
 
-    _axis(dir = new THREE.Vector3(1, 0, 0), color = 0xff0000, name = "") {
-        const axis = new THREE.ArrowHelper(dir, new THREE.Vector3(0, 0, 0), this.size, color, 0.05, 0.05);
-        axis.name = name;
+    _axis(color = 0xff0000, name = "") {
 
-        return axis;
+        const group = new THREE.Group();
+
+        const stem = this._axis_stem(color);
+        const head = this._axis_head(color, name);
+
+        group.add(stem);
+        group.add(head);
+
+        return group;
+    }
+
+    _axis_stem(color = 0xff0000) {
+        const geometry = new THREE.CylinderGeometry(0.004, 0.004, this.size, 32);
+        const material = new THREE.MeshBasicMaterial({ color: color });
+
+        const mesh = new THREE.Mesh(geometry, material);
+
+        mesh.position.y = this.size / 2;
+
+        return mesh
+    }
+
+    _axis_head(color = 0xff0000, name = "") {
+        const geometry = new THREE.ConeGeometry(0.05, 0.1, 32);
+        const material = new THREE.MeshBasicMaterial({ color: color });
+
+        const mesh = new THREE.Mesh(geometry, material);
+
+        mesh.position.y = this.size;
+
+        mesh.name = name;
+
+        return mesh
     }
 }
