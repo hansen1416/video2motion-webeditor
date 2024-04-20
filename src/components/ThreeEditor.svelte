@@ -181,13 +181,13 @@
 		translationControl.setBone(selectedBone);
 
 		if (_control_type === "rotation") {
+			translationControl.hide();
 			rotationControl.update();
 			rotationControl.show();
-			translationControl.hide();
 		} else if (_control_type === "translation") {
-			translationControl.show();
-			rotationControl.update();
 			rotationControl.hide();
+			translationControl.update();
+			translationControl.show();
 		}
 	}
 
@@ -209,10 +209,12 @@
 		_control_type = value as "rotation" | "translation";
 
 		if (value === "rotation") {
-			rotationControl.show();
 			translationControl.hide();
+			rotationControl.update();
+			rotationControl.show();
 		} else if (value === "translation") {
 			rotationControl.hide();
+			translationControl.update();
 			translationControl.show();
 		}
 
@@ -235,7 +237,6 @@
 		skeleton.updateBonePositions();
 
 		rotationControl.update();
-
 		translationControl.update();
 	}
 </script>
