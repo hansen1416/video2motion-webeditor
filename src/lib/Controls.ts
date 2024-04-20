@@ -17,6 +17,7 @@ abstract class BaseControl {
     }
 
     hide() {
+        this.group.position.set(-1000, -1000, -1000);
         this.group.visible = false;
     }
 
@@ -69,13 +70,13 @@ export class RotationControl extends BaseControl {
 
     init() {
 
-        const xaxis = this.createCircle(0xff0000);
+        const xaxis = this._circle(0xff0000, "xrotation");
         xaxis.rotation.y = Math.PI / 2;
 
-        const yaxis = this.createCircle(0x00ff00);
+        const yaxis = this._circle(0x00ff00, "yrotation");
         yaxis.rotation.x = Math.PI / 2;
 
-        const zaxis = this.createCircle(0x0000ff);
+        const zaxis = this._circle(0x0000ff, "zrotation");
         zaxis.rotation.z = Math.PI / 2;
 
         this.group.add(xaxis);
@@ -89,7 +90,7 @@ export class RotationControl extends BaseControl {
      * @param color 
      * @returns 
      */
-    createCircle(color: number): Line2 {
+    _circle(color: number, name = ""): Line2 {
 
         // get points from a circle
         const points = samplePointsOnCircle(this.radius, 100);
@@ -116,6 +117,7 @@ export class RotationControl extends BaseControl {
 
         const line = new Line2(geometry, matLine);
         line.computeLineDistances();
+        line.name = name;
 
         return line;
 
@@ -134,16 +136,19 @@ export class TranslationControl extends BaseControl {
     }
 
     init() {
-        const xaxis = this._axis(new THREE.Vector3(1, 0, 0), 0xff0000);
-        const yaxis = this._axis(new THREE.Vector3(0, 1, 0), 0x00ff00);
-        const zaxis = this._axis(new THREE.Vector3(0, 0, 1), 0x0000ff);
+        const xaxis = this._axis(new THREE.Vector3(1, 0, 0), 0xff0000, "xaxis");
+        const yaxis = this._axis(new THREE.Vector3(0, 1, 0), 0x00ff00, "yaxis");
+        const zaxis = this._axis(new THREE.Vector3(0, 0, 1), 0x0000ff, "zaxis");
 
         this.group.add(xaxis);
         this.group.add(yaxis);
         this.group.add(zaxis);
     }
 
-    _axis(dir = new THREE.Vector3(1, 0, 0), color = 0xff0000) {
-        return new THREE.ArrowHelper(dir, new THREE.Vector3(0, 0, 0), this.size, color);
+    _axis(dir = new THREE.Vector3(1, 0, 0), color = 0xff0000, name = "") {
+        const axis = new THREE.ArrowHelper(dir, new THREE.Vector3(0, 0, 0), this.size, color, 0.05, 0.05);
+        axis.name = name;
+
+        return axis;
     }
 }

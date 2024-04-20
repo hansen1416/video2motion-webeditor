@@ -49,7 +49,11 @@
 			raycaster.setFromCamera(mouse, threeScene.camera);
 
 			intersects = raycaster.intersectObjects(
-				skeleton.group.children,
+				[
+					...skeleton.group.children,
+					...rotationControl.group.children,
+					...translationControl.group.children,
+				],
 				true,
 			);
 
@@ -163,28 +167,30 @@
 		}
 
 		// selected bone joints
-		const joint = intersects[0].object;
+		const selectedBone = bones[intersects[0].object.name];
 
-		const bone = bones[joint.name];
-
-		rotationControl.setBone(bone);
-		translationControl.setBone(bone);
+		rotationControl.setBone(selectedBone);
+		translationControl.setBone(selectedBone);
 
 		if (_control_type === "rotation") {
 			rotationControl.show();
 			translationControl.hide();
 		} else if (_control_type === "translation") {
-			translationControl.hide();
+			translationControl.show();
 			rotationControl.hide();
 		}
-
-		// todo, add rotation, translation control
 	}
 
 	$: if (intersects.length > 0) {
-		skeleton.highlightBone(intersects[0].object.name);
+		// todo coulod be bones, rotations, translations
+		// const names = [];
+		// for (const intersect of intersects) {
+		// 	names.push(intersect.object.name);
+		// }
+		// console.log(names);
+		// skeleton.highlightBone(intersects[0].object.name);
 	} else {
-		skeleton.highlightBone("");
+		// skeleton.highlightBone("");
 	}
 
 	control_type.subscribe((value: "rotation" | "translation") => {
