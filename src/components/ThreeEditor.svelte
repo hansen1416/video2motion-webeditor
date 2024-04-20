@@ -167,13 +167,14 @@
 
 		const bone = bones[joint.name];
 
-		if (_control_type === "rotation") {
-			rotationControl.setBone(bone);
+		rotationControl.setBone(bone);
+		translationControl.setBone(bone);
 
+		if (_control_type === "rotation") {
+			rotationControl.show();
 			translationControl.hide();
 		} else if (_control_type === "translation") {
-			translationControl.setBone(bone);
-
+			translationControl.hide();
 			rotationControl.hide();
 		}
 
@@ -186,8 +187,16 @@
 		skeleton.highlightBone("");
 	}
 
-	control_type.subscribe((value) => {
+	control_type.subscribe((value: "rotation" | "translation") => {
 		_control_type = value as "rotation" | "translation";
+
+		if (value === "rotation") {
+			rotationControl.show();
+			translationControl.hide();
+		} else if (value === "translation") {
+			rotationControl.hide();
+			translationControl.show();
+		}
 
 		// todo check if the bone is selected, if yes, switch the control
 	});

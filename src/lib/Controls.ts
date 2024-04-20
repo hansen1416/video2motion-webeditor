@@ -21,14 +21,15 @@ abstract class BaseControl {
     }
 
     show() {
-        this.group.visible = true;
+        if (this.bone) {
+            this.group.visible = true;
+        }
     }
 
     setBone(bone: THREE.Object3D) {
         this.bone = bone;
 
         this.update();
-        this.show()
     }
 
     update() {
@@ -49,6 +50,8 @@ function samplePointsOnCircle(radius: number, numPoints: number) {
         const y = radius * Math.sin(angle);
         points.push(new THREE.Vector3(x, y, 0)); // Adjust z-coordinate if needed
     }
+
+    points.push(points[0]); // Close the circle
 
     return points;
 }
@@ -103,7 +106,7 @@ export class RotationControl extends BaseControl {
         const matLine = new LineMaterial({
 
             color: color,
-            linewidth: 0.003, // in world units with size attenuation, pixels otherwise
+            linewidth: 0.005, // in world units with size attenuation, pixels otherwise
             // vertexColors: true,
 
             //resolution:  // to be set by renderer, eventually
