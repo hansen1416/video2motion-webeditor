@@ -192,11 +192,11 @@
 	}
 
 	$: if (intersects.length > 0) {
-		// todo coulod be bones, rotations, translations
-
 		const intersection = getNamedIntersects(intersects);
 
 		if (intersection) {
+			// todo could be bones, rotations, translations
+
 			skeleton.highlightBone(
 				skeleton.getBoneIndex(intersection.object.name),
 			);
