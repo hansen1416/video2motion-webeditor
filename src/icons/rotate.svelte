@@ -5,10 +5,10 @@
 	export let color: string = "#fff";
 
 	control_type.subscribe((value) => {
-		if (value === "translation") {
-			color = "#fff";
-		} else {
+		if (value === "rotation") {
 			color = "#ccc";
+		} else {
+			color = "#fff";
 		}
 	});
 </script>

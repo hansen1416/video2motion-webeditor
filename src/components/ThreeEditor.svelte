@@ -47,7 +47,7 @@
 	let rotationControl = new RotationControl();
 	let translationControl = new TranslationControl();
 
-	let _control_type: "rotation" | "translation" = "rotation";
+	let _control_type: "rotation" | "translation" | "" = "";
 
 	function animate() {
 		if (threeScene) {
@@ -188,6 +188,8 @@
 			rotationControl.hide();
 			translationControl.update();
 			translationControl.show();
+		} else if (_control_type === "") {
+			control_type.set("rotation");
 		}
 	}
 
@@ -219,6 +221,9 @@
 			rotationControl.hide();
 			translationControl.update();
 			translationControl.show();
+		} else {
+			rotationControl.hide();
+			translationControl.hide();
 		}
 
 		// todo check if the bone is selected, if yes, switch the control

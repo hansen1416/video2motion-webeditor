@@ -2,6 +2,12 @@
 	import Icon from "../icons/Icon.svelte";
 	import { display_scene, control_type } from "../store";
 	import WebStorage from "../lib/WebStorage";
+
+	let _control_type: "rotation" | "translation" | "" = "";
+
+	control_type.subscribe((value) => {
+		_control_type = value;
+	});
 </script>
 
 <section class="panel">
@@ -23,7 +29,12 @@
 	</button>
 	<button
 		on:click={() => {
-			control_type.set("translation");
+			if (_control_type === "translation") {
+				control_type.set("");
+			} else {
+				control_type.set("translation");
+			}
+
 			WebStorage.save("control_type", "translation");
 		}}
 	>
@@ -31,7 +42,12 @@
 	</button>
 	<button
 		on:click={() => {
-			control_type.set("rotation");
+			if (_control_type === "rotation") {
+				control_type.set("");
+			} else {
+				control_type.set("rotation");
+			}
+
 			WebStorage.save("control_type", "rotation");
 		}}
 	>
