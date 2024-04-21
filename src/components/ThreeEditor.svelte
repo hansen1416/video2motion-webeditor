@@ -17,6 +17,7 @@
 		loadJSON,
 		getNamedIntersects,
 		setMeshOpacity,
+		getMousePosition,
 	} from "../utils/ropes";
 
 	let canvas: HTMLCanvasElement;
@@ -48,6 +49,10 @@
 	let translationControl = new TranslationControl();
 
 	let _control_type: "rotation" | "translation" | "" = "";
+
+	let in_dragging: boolean = false;
+
+	let dragstart_position = new THREE.Vector2();
 
 	function animate() {
 		if (threeScene) {
@@ -127,7 +132,9 @@
 			skeleton.updateBonePositions();
 			// initial animation data end
 
+			canvas.addEventListener("mousedown", onMouseDown);
 			canvas.addEventListener("mousemove", onMouseMove);
+			canvas.addEventListener("mouseup", onMouseUp);
 			canvas.addEventListener("click", onClick);
 
 			animate();
@@ -154,14 +161,37 @@
 		threeScene.dispose();
 	});
 
+	function onMouseDown(event: MouseEvent) {
+		event.preventDefault();
+
+		const intersection = getNamedIntersects(intersects);
+
+		if (intersection === null) {
+			return;
+		}
+
+		in_dragging = true;
+
+		// dragstart_position =
+
+		console.log("in_dragging", in_dragging);
+	}
+
 	/**
 	 * mouse position for interactions
 	 */
 	function onMouseMove(event: MouseEvent) {
 		event.preventDefault();
 
-		mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-		mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+		mouse.copy(getMousePosition(event));
+	}
+
+	function onMouseUp(event: MouseEvent) {
+		console.log("in_dragging", in_dragging);
+
+		in_dragging = false;
+
+		console.log("in_dragging", in_dragging);
 	}
 
 	function onClick(event: MouseEvent) {

@@ -87,3 +87,9 @@ export function setMeshOpacity(object3d: THREE.Object3D, opacity: number): void 
         mat.opacity = opacity;
     }
 }
+
+export function getMousePosition(event: MouseEvent): { "x": number, "y": number } {
+    const x = (event.clientX / window.innerWidth) * 2 - 1;
+    const y = -(event.clientY / window.innerHeight) * 2 + 1;
+    return { x: x, y: y }
+}
