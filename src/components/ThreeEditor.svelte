@@ -172,6 +172,9 @@
 
 		in_dragging = true;
 
+		// start dragging, disable control
+		threeScene.disableControl();
+
 		// dragstart_position =
 
 		console.log("in_dragging", in_dragging);
@@ -190,6 +193,9 @@
 		console.log("in_dragging", in_dragging);
 
 		in_dragging = false;
+
+		// dragging finished enable control
+		threeScene.enableControl();
 
 		console.log("in_dragging", in_dragging);
 	}

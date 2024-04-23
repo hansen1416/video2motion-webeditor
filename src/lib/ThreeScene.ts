@@ -40,7 +40,7 @@ export default class ThreeScene {
      * @param width 
      * @param height 
      */
-    constructor(canvas: HTMLCanvasElement, width:number, height:number) {
+    constructor(canvas: HTMLCanvasElement, width: number, height: number) {
 
 
         this.scene = new THREE.Scene();
@@ -103,7 +103,7 @@ export default class ThreeScene {
 
     }
 
-    dispose () {
+    dispose() {
         // this.renderer.dispose();
         // this.renderer.forceContextLoss();
         // this.renderer.context = null;
@@ -111,11 +111,11 @@ export default class ThreeScene {
         // this.renderer = null;
     }
 
-    onFrameUpdate (stats:Stats | null = null) {
+    onFrameUpdate(stats: Stats | null = null) {
 
         // this.followTarget(0, 270);
 
-        // this.controls.update();
+        this.controls.update();
 
         this.renderer.render(this.scene, this.camera);
 
@@ -124,7 +124,15 @@ export default class ThreeScene {
         }
     }
 
-    resetControl () {
+    resetControl() {
         this.controls.reset();
+    }
+
+    disableControl() {
+        this.controls.enabled = false;
+    }
+
+    enableControl() {
+        this.controls.enabled = true;
     }
 }
