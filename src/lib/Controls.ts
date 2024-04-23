@@ -122,6 +122,24 @@ export class RotationControl extends BaseControl {
         return line;
 
     }
+
+    rotate(axis: string, angle: number): void {
+        if (!this.bone) {
+            return;
+        }
+
+        switch (axis) {
+            case "rotation_x":
+                this.bone.rotation.x += angle;
+                break;
+            case "rotation_y":
+                this.bone.rotation.y += angle;
+                break;
+            case "rotation_z":
+                this.bone.rotation.z += angle;
+                break;
+        }
+    }
 }
 
 export class TranslationControl extends BaseControl {

@@ -43,6 +43,8 @@
 	const mouse = new THREE.Vector2();
 
 	let intersects: THREE.Intersection[] = [];
+	// this is first valid intersection object
+	let intersection: THREE.Intersection | null = null;
 
 	let skeleton = new Skeleton();
 	let rotationControl = new RotationControl();
@@ -52,7 +54,7 @@
 
 	let in_dragging: boolean = false;
 
-	let dragstart_position = new THREE.Vector2();
+	let drag_start = new THREE.Vector2();
 
 	function animate() {
 		if (threeScene) {
@@ -164,7 +166,7 @@
 	function onMouseDown(event: MouseEvent) {
 		event.preventDefault();
 
-		const intersection = getNamedIntersects(intersects);
+		intersection = getNamedIntersects(intersects);
 
 		if (intersection === null) {
 			return;
@@ -175,9 +177,10 @@
 		// start dragging, disable control
 		threeScene.disableControl();
 
-		// dragstart_position =
+		const pos = getMousePosition(event);
 
-		console.log("in_dragging", in_dragging);
+		drag_start.x = pos.x;
+		drag_start.y = pos.y;
 	}
 
 	/**
@@ -186,25 +189,40 @@
 	function onMouseMove(event: MouseEvent) {
 		event.preventDefault();
 
-		mouse.copy(getMousePosition(event));
+		const current_pos = getMousePosition(event);
+
+		mouse.copy(current_pos);
+
+		if (in_dragging && intersection) {
+			const drag_vector = new THREE.Vector2(
+				current_pos.x - drag_start.x,
+				current_pos.y - drag_start.y,
+			);
+
+			// todo, need to calculate the current axis world angle,
+			// and calculate the drag vector shift relative to the world axis
+			if (_control_type === "rotation") {
+				//console.log(intersection.object.name);
+
+				rotationControl.rotate(intersection.object.name, drag_vector.x);
+			} else if (_control_type === "translation") {
+				// translationControl.translate(drag_vector);
+			}
+		}
 	}
 
 	function onMouseUp(event: MouseEvent) {
-		console.log("in_dragging", in_dragging);
-
 		in_dragging = false;
 
 		// dragging finished enable control
 		threeScene.enableControl();
-
-		console.log("in_dragging", in_dragging);
 	}
 
 	function onClick(event: MouseEvent) {
 		event.preventDefault();
 
 		//
-		const intersection = getNamedIntersects(intersects);
+		intersection = getNamedIntersects(intersects);
 
 		if (intersection === null) {
 			return;
@@ -230,7 +248,7 @@
 	}
 
 	$: if (intersects.length > 0) {
-		const intersection = getNamedIntersects(intersects);
+		intersection = getNamedIntersects(intersects);
 
 		if (intersection) {
 			// todo could be bones, rotations, translations
