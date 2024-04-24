@@ -61,27 +61,28 @@ export class RotationControl extends BaseControl {
 
     radius: number = 0.2
 
+    xaxis: Line2;
+
+    yaxis: Line2;
+
+    zaxis: Line2;
+
     constructor() {
 
         super();
 
-        this.init();
-    }
+        this.xaxis = this._circle(0xff0000, "rotation_x");
+        this.xaxis.rotation.y = Math.PI / 2;
 
-    init() {
+        this.yaxis = this._circle(0x00ff00, "rotation_y");
+        this.yaxis.rotation.x = Math.PI / 2;
 
-        const xaxis = this._circle(0xff0000, "rotation_x");
-        xaxis.rotation.y = Math.PI / 2;
+        this.zaxis = this._circle(0x0000ff, "rotation_z");
+        this.zaxis.rotation.z = Math.PI / 2;
 
-        const yaxis = this._circle(0x00ff00, "rotation_y");
-        yaxis.rotation.x = Math.PI / 2;
-
-        const zaxis = this._circle(0x0000ff, "rotation_z");
-        zaxis.rotation.z = Math.PI / 2;
-
-        this.group.add(xaxis);
-        this.group.add(yaxis);
-        this.group.add(zaxis);
+        this.group.add(this.xaxis);
+        this.group.add(this.yaxis);
+        this.group.add(this.zaxis);
     }
 
 
@@ -113,6 +114,8 @@ export class RotationControl extends BaseControl {
             //resolution:  // to be set by renderer, eventually
             dashed: false,
             alphaToCoverage: true,
+
+            transparent: true,
         });
 
         const line = new Line2(geometry, matLine);
@@ -128,17 +131,38 @@ export class RotationControl extends BaseControl {
             return;
         }
 
+
+
         switch (axis) {
             case "rotation_x":
                 this.bone.rotation.x += angle;
+
+                this.xaxis.material.opacity = 0.5;
+
+                this.xaxis.rotation.x += angle;
                 break;
             case "rotation_y":
                 this.bone.rotation.y += angle;
+
+                this.yaxis.material.opacity = 0.5;
+
+                this.yaxis.rotation.z += angle;
+
                 break;
             case "rotation_z":
                 this.bone.rotation.z += angle;
+
+                this.zaxis.material.opacity = 0.5;
+
+                this.zaxis.rotation.z += angle;
                 break;
         }
+    }
+
+    rotationDone() {
+        this.xaxis.material.opacity = 1;
+        this.yaxis.material.opacity = 1;
+        this.zaxis.material.opacity = 1;
     }
 }
 

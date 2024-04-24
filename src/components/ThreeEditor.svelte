@@ -214,6 +214,8 @@
 	function onMouseUp(event: MouseEvent) {
 		in_dragging = false;
 
+		rotationControl.rotationDone();
+
 		// dragging finished enable control
 		threeScene.enableControl();
 	}
