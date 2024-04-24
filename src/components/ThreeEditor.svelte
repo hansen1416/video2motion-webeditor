@@ -11,8 +11,14 @@
 	import type { AnimationDataObject } from "../lib/AnimationData";
 	import Skeleton from "../lib/Skeleton";
 	import { RotationControl, TranslationControl } from "../lib/Controls";
-	import { loadGLTF, loadJSON } from "../utils/ropes";
-	import { displayScene, controlType } from "../store";
+	import { display_scene, control_type } from "../store";
+	import {
+		loadGLTF,
+		loadJSON,
+		getNamedIntersects,
+		setMeshOpacity,
+		getMousePosition,
+	} from "../utils/ropes";
 
 	let canvas: HTMLCanvasElement;
 
@@ -37,19 +43,29 @@
 	const mouse = new THREE.Vector2();
 
 	let intersects: THREE.Intersection[] = [];
+	// this is first valid intersection object
+	let intersection: THREE.Intersection | null = null;
 
 	let skeleton = new Skeleton();
 	let rotationControl = new RotationControl();
 	let translationControl = new TranslationControl();
 
-	let control_type: "rotation" | "translation" = "rotation";
+	let _control_type: "rotation" | "translation" | "" = "";
+
+	let in_dragging: boolean = false;
+
+	let drag_start = new THREE.Vector2();
 
 	function animate() {
 		if (threeScene) {
 			raycaster.setFromCamera(mouse, threeScene.camera);
 
 			intersects = raycaster.intersectObjects(
-				skeleton.group.children,
+				[
+					...skeleton.group.children,
+					...rotationControl.group.children,
+					...translationControl.group.children,
+				],
 				true,
 			);
 
@@ -118,10 +134,25 @@
 			skeleton.updateBonePositions();
 			// initial animation data end
 
+			canvas.addEventListener("mousedown", onMouseDown);
 			canvas.addEventListener("mousemove", onMouseMove);
+			canvas.addEventListener("mouseup", onMouseUp);
 			canvas.addEventListener("click", onClick);
 
 			animate();
+
+			// this subscribe must happen after the scene is loaded
+			display_scene.subscribe((value) => {
+				if (value === "skeleton") {
+					skeleton.show();
+
+					setMeshOpacity(diva, 0.6);
+				} else {
+					skeleton.hide();
+
+					setMeshOpacity(diva, 1);
+				}
+			});
 		});
 	});
 
@@ -132,77 +163,127 @@
 		threeScene.dispose();
 	});
 
+	function onMouseDown(event: MouseEvent) {
+		event.preventDefault();
+
+		intersection = getNamedIntersects(intersects);
+
+		if (intersection === null) {
+			return;
+		}
+
+		in_dragging = true;
+
+		// start dragging, disable control
+		threeScene.disableControl();
+
+		const pos = getMousePosition(event);
+
+		drag_start.x = pos.x;
+		drag_start.y = pos.y;
+	}
+
 	/**
 	 * mouse position for interactions
 	 */
 	function onMouseMove(event: MouseEvent) {
 		event.preventDefault();
 
-		mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-		mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+		const current_pos = getMousePosition(event);
+
+		mouse.copy(current_pos);
+
+		if (in_dragging && intersection) {
+			const drag_vector = new THREE.Vector2(
+				current_pos.x - drag_start.x,
+				current_pos.y - drag_start.y,
+			);
+
+			// todo, need to calculate the current axis world angle,
+			// and calculate the drag vector shift relative to the world axis
+			if (_control_type === "rotation") {
+				//console.log(intersection.object.name);
+
+				rotationControl.rotate(intersection.object.name, drag_vector.x);
+			} else if (_control_type === "translation") {
+				// translationControl.translate(drag_vector);
+			}
+		}
+	}
+
+	function onMouseUp(event: MouseEvent) {
+		in_dragging = false;
+
+		// dragging finished enable control
+		threeScene.enableControl();
 	}
 
 	function onClick(event: MouseEvent) {
 		event.preventDefault();
 
-		if (intersects.length === 0) {
+		//
+		intersection = getNamedIntersects(intersects);
+
+		if (intersection === null) {
 			return;
 		}
 
 		// intersection[0].instanceId;
 
-		// selected bone
-		const bone = intersects[0].object;
+		// selected bone joints
+		const selectedBone = bones[intersection.object.name];
 
-		if (control_type === "rotation") {
-			rotationControl.show(bone.position);
+		rotationControl.setBone(selectedBone);
+		translationControl.setBone(selectedBone);
+
+		if (_control_type === "rotation") {
 			translationControl.hide();
-		} else if (control_type === "translation") {
-			translationControl.show(bone.position);
+			rotationControl.update();
+			rotationControl.show();
+		} else if (_control_type === "translation") {
 			rotationControl.hide();
+			translationControl.update();
+			translationControl.show();
+		} else if (_control_type === "") {
+			control_type.set("rotation");
 		}
-
-		// todo, add rotation, translation control
 	}
 
 	$: if (intersects.length > 0) {
-		skeleton.highlightBone(intersects[0].object.name);
+		intersection = getNamedIntersects(intersects);
+
+		if (intersection) {
+			// todo could be bones, rotations, translations
+			console.log(intersection.object.name);
+
+			skeleton.highlightBone(
+				skeleton.getBoneIndex(intersection.object.name),
+			);
+		} else {
+			skeleton.highlightBone(-1);
+		}
 	} else {
-		skeleton.highlightBone("");
+		skeleton.highlightBone(-1);
 	}
 
-	displayScene.subscribe((value) => {
-		if (!threeScene) {
-			return;
-		}
+	control_type.subscribe((value: "rotation" | "translation") => {
+		_control_type = value as "rotation" | "translation";
 
-		if (value === "skeleton") {
-			skeleton.show();
-
-			_setDivaOpacity(0.6);
+		if (value === "rotation") {
+			translationControl.hide();
+			rotationControl.update();
+			rotationControl.show();
+		} else if (value === "translation") {
+			rotationControl.hide();
+			translationControl.update();
+			translationControl.show();
 		} else {
-			skeleton.hide();
-
-			_setDivaOpacity(1);
+			rotationControl.hide();
+			translationControl.hide();
 		}
-	});
-
-	controlType.subscribe((value) => {
-		control_type = value as "rotation" | "translation";
 
 		// todo check if the bone is selected, if yes, switch the control
 	});
-
-	function _setDivaOpacity(opacity: number): void {
-		for (const child of diva.children) {
-			if (child instanceof THREE.SkinnedMesh === false) continue;
-
-			const mat = (child as THREE.SkinnedMesh)
-				.material as THREE.MeshStandardMaterial;
-
-			mat.opacity = opacity;
-		}
-	}
 
 	/**
 	 * update frame callback, set bone rotations and positions
@@ -218,6 +299,9 @@
 		animtionData.applyRotation(event.detail.frame_idx);
 
 		skeleton.updateBonePositions();
+
+		rotationControl.update();
+		translationControl.update();
 	}
 </script>
 

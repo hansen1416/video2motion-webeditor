@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { displayScene } from "../store";
+	import { display_scene } from "../store";
 
 	export let size: number = 24;
 	export let color: string = "#fff";
 
-	displayScene.subscribe((value) => {
+	display_scene.subscribe((value) => {
 		if (value === "mesh") {
-			color = "#fff";
-		} else {
 			color = "#ccc";
+		} else {
+			color = "#fff";
 		}
 	});
 </script>

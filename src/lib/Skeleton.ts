@@ -58,10 +58,20 @@ export default class Skeleton {
         this.bones = bones;
     }
 
+    getBoneIndex(bone_name: string) {
+        const idx = this.bone_names[bone_name];
+
+        if (idx === undefined) {
+            return -1;
+        }
+
+        return idx;
+    }
+
     updateBonePositions() {
         Object.entries(this.bones).forEach(([bone_name, bone]) => {
 
-            if (!this.bone_names[bone_name]) {
+            if (this.getBoneIndex(bone_name) === -1) {
                 return;
             }
 
@@ -69,24 +79,21 @@ export default class Skeleton {
 
             bone.getWorldPosition(v);
 
-            this.group.children[this.bone_names[bone_name]].position.copy(v);
+            this.group.children[this.getBoneIndex(bone_name)].position.copy(v);
         })
     }
 
-    highlightBone(bone_name: string) {
-        // If the no bone is scaled, and the bone_name is empty, do nothing
-        if (this.scaled === -1 && bone_name === "") {
-            return;
-        }
+    highlightBone(bone_index: number) {
+
         // If the bone is already scaled, do nothing
-        if (this.scaled === this.bone_names[bone_name]) {
+        if (this.scaled === bone_index) {
             return;
         }
 
         this.scaled = -1;
 
-        Object.entries(this.bone_names).forEach(([key, i]) => {
-            if (key === bone_name) {
+        for (let i = 0; i < this.group.children.length; i++) {
+            if (i === bone_index) {
                 this.group.children[i].scale.x = 1.5;
                 this.group.children[i].scale.y = 1.5;
                 this.group.children[i].scale.z = 1.5;
@@ -97,7 +104,8 @@ export default class Skeleton {
                 this.group.children[i].scale.y = 1;
                 this.group.children[i].scale.z = 1;
             }
-        })
+
+        }
     }
 
     hide() {
