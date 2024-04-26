@@ -56,6 +56,8 @@
 
 	let drag_start = new THREE.Vector2();
 
+	let all_done: boolean = false;
+
 	function animate() {
 		if (threeScene) {
 			raycaster.setFromCamera(mouse, threeScene.camera);
@@ -153,6 +155,8 @@
 					setMeshOpacity(diva, 1);
 				}
 			});
+
+			all_done = true;
 		});
 	});
 
@@ -322,6 +326,10 @@
 	<Panel />
 </section>
 
+{#if all_done}
+	<div id="done"></div>
+{/if}
+
 <style>
 	canvas {
 		width: 100vw;
@@ -336,5 +344,11 @@
 		left: 50%;
 		bottom: 30px;
 		margin-left: -40vw;
+	}
+
+	#done {
+		position: absolute;
+		bottom: -1;
+		left: 0;
 	}
 </style>
