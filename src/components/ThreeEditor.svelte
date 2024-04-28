@@ -58,6 +58,8 @@
 
 	let all_done: boolean = false;
 
+	let current_bone_rotation: THREE.Euler = new THREE.Euler();
+
 	function animate() {
 		if (threeScene) {
 			raycaster.setFromCamera(mouse, threeScene.camera);
@@ -239,6 +241,9 @@
 		// selected bone joints
 		const selectedBone = bones[intersection.object.name];
 
+		// get the current bone rotation, will be displayed in the control panel
+		current_bone_rotation = selectedBone.rotation.clone();
+
 		rotationControl.setBone(selectedBone);
 		translationControl.setBone(selectedBone);
 
@@ -309,6 +314,11 @@
 		rotationControl.update();
 		translationControl.update();
 	}
+
+	function editBoneRotation(event: CustomEvent<THREE.Euler>) {
+		// current_bone_rotation = event.detail;
+		// todo edit bone roation, update `current_bone_rotation` and animation data
+	}
 </script>
 
 <section class="three-editor">
@@ -323,7 +333,7 @@
 		/>
 	</div>
 
-	<Panel />
+	<Panel {current_bone_rotation} on:edit_bone_rotation={editBoneRotation} />
 </section>
 
 {#if all_done}

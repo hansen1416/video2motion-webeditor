@@ -1,13 +1,28 @@
 <script lang="ts">
+	import { onDestroy, onMount, createEventDispatcher } from "svelte";
+	import * as THREE from "three";
+
 	import Icon from "../icons/Icon.svelte";
 	import { display_scene, control_type } from "../store";
 	import WebStorage from "../lib/WebStorage";
+
+	export let current_bone_rotation: THREE.Euler;
+
+	const dispatch = createEventDispatcher();
 
 	let _control_type: "rotation" | "translation" | "" = "";
 
 	control_type.subscribe((value) => {
 		_control_type = value;
 	});
+
+	function editRotation(e) {
+		console.log(e);
+
+		// const value = parseFloat(e.target.value);
+
+		// dispatch("update", { axis: "x", value });
+	}
 </script>
 
 <section class="panel">
@@ -53,6 +68,18 @@
 	>
 		<Icon name="rotate" />
 	</button>
+	<label>
+		<span>x:</span>
+		<input bind:value={current_bone_rotation.x} on:change={editRotation} />
+	</label>
+	<label>
+		<span>y:</span>
+		<input bind:value={current_bone_rotation.y} on:change={editRotation} />
+	</label>
+	<label>
+		<span>z:</span>
+		<input bind:value={current_bone_rotation.z} on:change={editRotation} />
+	</label>
 </section>
 
 <style>

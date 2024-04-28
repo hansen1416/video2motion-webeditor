@@ -69,6 +69,7 @@ export default class Skeleton {
     }
 
     updateBonePositions() {
+        // get the current bone world positions, and update corresponding skeleton joints positions
         Object.entries(this.bones).forEach(([bone_name, bone]) => {
 
             if (this.getBoneIndex(bone_name) === -1) {
