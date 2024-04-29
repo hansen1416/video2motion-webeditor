@@ -10,10 +10,10 @@
 
 	const dispatch = createEventDispatcher();
 
-	let _control_type: "rotation" | "translation" | "" = "";
+	let _controlType: "rotation" | "translation" | "" = "";
 
 	control_type.subscribe((value) => {
-		_control_type = value;
+		_controlType = value;
 	});
 
 	function editRotation(e: Event) {
@@ -44,7 +44,7 @@
 	</button>
 	<button
 		on:click={() => {
-			if (_control_type === "translation") {
+			if (_controlType === "translation") {
 				control_type.set("");
 			} else {
 				control_type.set("translation");
@@ -57,7 +57,7 @@
 	</button>
 	<button
 		on:click={() => {
-			if (_control_type === "rotation") {
+			if (_controlType === "rotation") {
 				control_type.set("");
 			} else {
 				control_type.set("rotation");
@@ -90,5 +90,10 @@
 		width: 60px;
 		height: 50vh;
 		background-color: rgba(200, 200, 200, 0.5);
+		padding-top: 12px;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		align-items: center;
 	}
 </style>
