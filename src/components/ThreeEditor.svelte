@@ -59,7 +59,7 @@
 
 	let all_done: boolean = false;
 
-	let current_bone_rotation: THREE.Euler = new THREE.Euler();
+	let currentBoneRotation: THREE.Euler = new THREE.Euler();
 
 	function animate() {
 		if (threeScene) {
@@ -262,10 +262,10 @@
 
 	$: if (selectedBone) {
 		// update the bone rotation
-		selectedBone.rotation.copy(current_bone_rotation);
+		selectedBone.rotation.copy(currentBoneRotation);
 
 		// get the current bone rotation, will be displayed in the control panel
-		current_bone_rotation = selectedBone.rotation.clone();
+		currentBoneRotation = selectedBone.rotation.clone();
 
 		rotationControl.setBone(selectedBone);
 		translationControl.setBone(selectedBone);
@@ -326,12 +326,12 @@
 			return;
 		}
 
-		current_bone_rotation = event.detail;
+		currentBoneRotation = event.detail;
 
-		// todo edit bone roation, update `current_bone_rotation` and animation data
+		// todo edit bone roation, update `currentBoneRotation` and animation data
 		animtionData.editBoneFrameRotation(
 			selectedBone.name,
-			current_bone_rotation,
+			currentBoneRotation,
 		);
 	}
 </script>
@@ -348,7 +348,7 @@
 		/>
 	</div>
 
-	<Panel {current_bone_rotation} on:edit_bone_rotation={editBoneRotation} />
+	<Panel {currentBoneRotation} on:edit_bone_rotation={editBoneRotation} />
 </section>
 
 {#if all_done}

@@ -6,7 +6,7 @@
 	import { display_scene, control_type } from "../store";
 	import WebStorage from "../lib/WebStorage";
 
-	export let current_bone_rotation: THREE.Euler;
+	export let currentBoneRotation: THREE.Euler;
 
 	const dispatch = createEventDispatcher();
 
@@ -19,9 +19,9 @@
 	function editRotation(e: Event) {
 		const value = parseFloat((e.target as HTMLInputElement).value);
 
-		current_bone_rotation.x = value;
+		currentBoneRotation.x = value;
 
-		dispatch("edit_bone_rotation", current_bone_rotation);
+		dispatch("edit_bone_rotation", currentBoneRotation);
 	}
 </script>
 
@@ -70,15 +70,15 @@
 	</button>
 	<label>
 		<span>x:</span>
-		<input bind:value={current_bone_rotation.x} on:change={editRotation} />
+		<input bind:value={currentBoneRotation.x} on:change={editRotation} />
 	</label>
 	<label>
 		<span>y:</span>
-		<input bind:value={current_bone_rotation.y} on:change={editRotation} />
+		<input bind:value={currentBoneRotation.y} on:change={editRotation} />
 	</label>
 	<label>
 		<span>z:</span>
-		<input bind:value={current_bone_rotation.z} on:change={editRotation} />
+		<input bind:value={currentBoneRotation.z} on:change={editRotation} />
 	</label>
 </section>
 
