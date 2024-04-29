@@ -51,13 +51,13 @@
 	let rotationControl = new RotationControl();
 	let translationControl = new TranslationControl();
 
-	let _control_type: ControlType = "";
+	let _controlType: ControlType = "";
 
 	let in_dragging: boolean = false;
 
 	let drag_start: THREE.Vector2 = new THREE.Vector2();
 
-	let all_done: boolean = false;
+	let allDone: boolean = false;
 
 	let currentBoneRotation: THREE.Euler = new THREE.Euler();
 
@@ -159,7 +159,7 @@
 				}
 			});
 
-			all_done = true;
+			allDone = true;
 		});
 	});
 
@@ -200,22 +200,13 @@
 
 		mouse.copy(current_pos);
 
-		if (in_dragging && intersection) {
-			const drag_vector = new THREE.Vector2(
-				current_pos.x - drag_start.x,
-				current_pos.y - drag_start.y,
-			);
-
-			// todo, need to calculate the current axis world angle,
-			// and calculate the drag vector shift relative to the world axis
-			if (_control_type === "rotation") {
-				//console.log(intersection.object.name);
-
-				rotationControl.rotate(intersection.object.name, drag_vector.x);
-			} else if (_control_type === "translation") {
-				// translationControl.translate(drag_vector);
-			}
-		}
+		// todo, use control to edit bone rotation
+		// if (in_dragging && intersection) {
+		// 	const drag_vector = new THREE.Vector2(
+		// 		current_pos.x - drag_start.x,
+		// 		current_pos.y - drag_start.y,
+		// 	);
+		// }
 	}
 
 	function onMouseUp(event: MouseEvent) {
@@ -270,21 +261,21 @@
 		rotationControl.setBone(selectedBone);
 		translationControl.setBone(selectedBone);
 
-		if (_control_type === "rotation") {
+		if (_controlType === "rotation") {
 			translationControl.hide();
 			rotationControl.update();
 			rotationControl.show();
-		} else if (_control_type === "translation") {
+		} else if (_controlType === "translation") {
 			rotationControl.hide();
 			translationControl.update();
 			translationControl.show();
-		} else if (_control_type === "") {
+		} else if (_controlType === "") {
 			control_type.set("rotation");
 		}
 	}
 
 	control_type.subscribe((value: "rotation" | "translation") => {
-		_control_type = value as "rotation" | "translation";
+		_controlType = value as "rotation" | "translation";
 
 		if (value === "rotation") {
 			translationControl.hide();
@@ -351,7 +342,7 @@
 	<Panel {currentBoneRotation} on:edit_bone_rotation={editBoneRotation} />
 </section>
 
-{#if all_done}
+{#if allDone}
 	<div id="done"></div>
 {/if}
 
