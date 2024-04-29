@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onDestroy, onMount, createEventDispatcher } from "svelte";
+	import { createEventDispatcher } from "svelte";
 	import * as THREE from "three";
 
 	import Icon from "../icons/Icon.svelte";
@@ -17,6 +17,8 @@
 	});
 
 	function editRotation(e: Event) {
+		console.log(111, e);
+
 		const value = parseFloat((e.target as HTMLInputElement).value);
 
 		currentBoneRotation.x = value;
@@ -70,15 +72,15 @@
 	</button>
 	<label>
 		<span>x:</span>
-		<input bind:value={currentBoneRotation.x} on:change={editRotation} />
+		<input value={currentBoneRotation.x} on:change={editRotation} />
 	</label>
 	<label>
 		<span>y:</span>
-		<input bind:value={currentBoneRotation.y} on:change={editRotation} />
+		<input value={currentBoneRotation.y} on:change={editRotation} />
 	</label>
 	<label>
 		<span>z:</span>
-		<input bind:value={currentBoneRotation.z} on:change={editRotation} />
+		<input value={currentBoneRotation.z} on:change={editRotation} />
 	</label>
 </section>
 

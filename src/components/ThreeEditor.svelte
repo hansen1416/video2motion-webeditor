@@ -252,9 +252,6 @@
 	}
 
 	$: if (selectedBone) {
-		// update the bone rotation
-		selectedBone.rotation.copy(currentBoneRotation);
-
 		// get the current bone rotation, will be displayed in the control panel
 		currentBoneRotation = selectedBone.rotation.clone();
 
@@ -339,7 +336,7 @@
 		/>
 	</div>
 
-	<Panel {currentBoneRotation} on:edit_bone_rotation={editBoneRotation} />
+	<Panel bind:currentBoneRotation on:edit_bone_rotation={editBoneRotation} />
 </section>
 
 {#if allDone}
