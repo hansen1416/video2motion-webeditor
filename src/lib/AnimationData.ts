@@ -1,16 +1,16 @@
 import * as THREE from "three";
 
-import type { AnimationDataObject, AnimationFrameDataObject } from "../types";
+import type { QuaternionArray, AnimationDataObject, AnimationFrameDataObject } from "../types";
 
 export default class AnimationData {
 
     total_frames: number = 0;
 
+    current_frame: number = 0;
+
     data: AnimationDataObject = {};
 
     bones: { [key: string]: THREE.Bone } = {};
-
-    current_frame: number = 0;
 
     constructor() {
 
@@ -53,9 +53,13 @@ export default class AnimationData {
     }
 
     editBoneFrameRotation(bone_name: string, rotation: THREE.Euler) {
-        // todo edit animation data at `current_frame`, on bone `bone_name`
 
-        // todo then apply the rotation to the bone
+        const q = new THREE.Quaternion().setFromEuler(rotation);
+        // edit animation data at `current_frame`, on bone `bone_name`
+        this.data[bone_name][this.current_frame] = q.toArray() as QuaternionArray;
+
+        // then apply the rotation to the bone
+        this.applyRotation(this.current_frame);
     }
 
 }
