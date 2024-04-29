@@ -8,7 +8,7 @@
 	import Panel from "./Panel.svelte";
 	import ThreeScene from "../lib/ThreeScene";
 	import AnimationData from "../lib/AnimationData";
-	import type { AnimationDataObject } from "../lib/AnimationData";
+	import type { AnimationDataObject, ControlType } from "../types";
 	import Skeleton from "../lib/Skeleton";
 	import { RotationControl, TranslationControl } from "../lib/Controls";
 	import { display_scene, control_type } from "../store";
@@ -34,7 +34,7 @@
 
 	let animtionData: AnimationData = new AnimationData();
 
-	let bones: { [key: string]: THREE.Object3D } = {};
+	let bones: { [key: string]: THREE.Bone } = {};
 
 	let diva: THREE.Object3D;
 
@@ -47,14 +47,15 @@
 	let intersection: THREE.Intersection | null = null;
 
 	let skeleton = new Skeleton();
+	let selectedBone: THREE.Bone | null = null;
 	let rotationControl = new RotationControl();
 	let translationControl = new TranslationControl();
 
-	let _control_type: "rotation" | "translation" | "" = "";
+	let _control_type: ControlType = "";
 
 	let in_dragging: boolean = false;
 
-	let drag_start = new THREE.Vector2();
+	let drag_start: THREE.Vector2 = new THREE.Vector2();
 
 	let all_done: boolean = false;
 
@@ -115,7 +116,7 @@
 					// @ts-ignore
 					if (bones[node.name] === undefined) {
 						// somehow maximo has double bones, so only use the first one
-						bones[node.name] = node;
+						bones[node.name] = node as THREE.Bone;
 					}
 				}
 			});
@@ -239,7 +240,29 @@
 		// intersection[0].instanceId;
 
 		// selected bone joints
-		const selectedBone = bones[intersection.object.name];
+		selectedBone = bones[intersection.object.name];
+	}
+
+	$: if (intersects.length > 0) {
+		intersection = getNamedIntersects(intersects);
+
+		if (intersection) {
+			// todo could be bones, rotations, translations
+			console.log(intersection.object.name);
+
+			skeleton.highlightBone(
+				skeleton.getBoneIndex(intersection.object.name),
+			);
+		} else {
+			skeleton.highlightBone(-1);
+		}
+	} else {
+		skeleton.highlightBone(-1);
+	}
+
+	$: if (selectedBone) {
+		// update the bone rotation
+		selectedBone.rotation.copy(current_bone_rotation);
 
 		// get the current bone rotation, will be displayed in the control panel
 		current_bone_rotation = selectedBone.rotation.clone();
@@ -258,23 +281,6 @@
 		} else if (_control_type === "") {
 			control_type.set("rotation");
 		}
-	}
-
-	$: if (intersects.length > 0) {
-		intersection = getNamedIntersects(intersects);
-
-		if (intersection) {
-			// todo could be bones, rotations, translations
-			console.log(intersection.object.name);
-
-			skeleton.highlightBone(
-				skeleton.getBoneIndex(intersection.object.name),
-			);
-		} else {
-			skeleton.highlightBone(-1);
-		}
-	} else {
-		skeleton.highlightBone(-1);
 	}
 
 	control_type.subscribe((value: "rotation" | "translation") => {
@@ -316,8 +322,17 @@
 	}
 
 	function editBoneRotation(event: CustomEvent<THREE.Euler>) {
-		// current_bone_rotation = event.detail;
+		if (!selectedBone) {
+			return;
+		}
+
+		current_bone_rotation = event.detail;
+
 		// todo edit bone roation, update `current_bone_rotation` and animation data
+		animtionData.editBoneFrameRotation(
+			selectedBone.name,
+			current_bone_rotation,
+		);
 	}
 </script>
 

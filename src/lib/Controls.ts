@@ -9,7 +9,7 @@ abstract class BaseControl {
 
     group: THREE.Group = new THREE.Group();
 
-    bone: THREE.Object3D | null = null;
+    bone: THREE.Bone | null = null;
 
     constructor() {
 
@@ -27,7 +27,7 @@ abstract class BaseControl {
         }
     }
 
-    setBone(bone: THREE.Object3D) {
+    setBone(bone: THREE.Bone) {
         this.bone = bone;
 
         this.update();
@@ -130,8 +130,6 @@ export class RotationControl extends BaseControl {
         if (!this.bone) {
             return;
         }
-
-
 
         switch (axis) {
             case "rotation_x":

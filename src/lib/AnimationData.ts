@@ -1,10 +1,6 @@
 import * as THREE from "three";
 
-export type QuaternionArray = [number, number, number, number];
-
-export type AnimationDataObject = { [key: string]: QuaternionArray[] };
-
-export type AnimationFrameDataObject = { [key: string]: QuaternionArray }
+import type { AnimationDataObject, AnimationFrameDataObject } from "../types";
 
 export default class AnimationData {
 
@@ -12,13 +8,15 @@ export default class AnimationData {
 
     data: AnimationDataObject = {};
 
-    bones: { [key: string]: THREE.Object3D } = {};
+    bones: { [key: string]: THREE.Bone } = {};
+
+    current_frame: number = 0;
 
     constructor() {
 
     }
 
-    loadData(data: AnimationDataObject, bones: { [key: string]: THREE.Object3D }) {
+    loadData(data: AnimationDataObject, bones: { [key: string]: THREE.Bone }) {
 
         this.bones = bones;
 
@@ -41,6 +39,9 @@ export default class AnimationData {
     }
 
     applyRotation(frame_idx: number) {
+
+        this.current_frame = frame_idx;
+
         let frame_data = this.getFrameData(frame_idx);
 
         for (let key in frame_data) {
@@ -49,19 +50,12 @@ export default class AnimationData {
             }
             this.bones[key].quaternion.fromArray(frame_data[key]);
         }
+    }
 
-        // for (const bone_name in frame_data) {
-        // 	const bone = bones[bone_name];
+    editBoneFrameRotation(bone_name: string, rotation: THREE.Euler) {
+        // todo edit animation data at `current_frame`, on bone `bone_name`
 
-        // 	if (bone) {
-        // 		const [x, y, z, w] = frame_data[bone_name];
-
-        // 		bone.rotation.setFromQuaternion(
-        // 			new THREE.Quaternion(x, y, z, w),
-        // 		);
-        // 	}
-        // }
-
+        // todo then apply the rotation to the bone
     }
 
 }

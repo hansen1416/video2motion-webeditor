@@ -32,7 +32,7 @@ export default class Skeleton {
         "RightToe_End": 24
     };
 
-    bones: { [key: string]: THREE.Object3D } = {};
+    bones: { [key: string]: THREE.Bone } = {};
 
     scaled: number = -1;
 
@@ -54,7 +54,7 @@ export default class Skeleton {
         this.hide()
     }
 
-    setBones(bones: { [key: string]: THREE.Object3D }) {
+    setBones(bones: { [key: string]: THREE.Bone }) {
         this.bones = bones;
     }
 

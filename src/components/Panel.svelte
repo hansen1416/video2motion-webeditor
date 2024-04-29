@@ -16,12 +16,12 @@
 		_control_type = value;
 	});
 
-	function editRotation(e) {
-		console.log(e);
+	function editRotation(e: Event) {
+		const value = parseFloat((e.target as HTMLInputElement).value);
 
-		// const value = parseFloat(e.target.value);
+		current_bone_rotation.x = value;
 
-		// dispatch("update", { axis: "x", value });
+		dispatch("edit_bone_rotation", current_bone_rotation);
 	}
 </script>
 
