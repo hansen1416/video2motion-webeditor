@@ -1,6 +1,7 @@
 import * as THREE from "three";
 
 import type { QuaternionArray, AnimationDataObject, AnimationFrameDataObject } from "../types";
+import { insertIntoSortedArray } from "../utils/ropes";
 
 export default class AnimationData {
 
@@ -11,6 +12,8 @@ export default class AnimationData {
     data: AnimationDataObject = {};
 
     bones: { [key: string]: THREE.Bone } = {};
+
+    keyframes: { [key: string]: number[] } = {}
 
     constructor() {
 
@@ -62,4 +65,48 @@ export default class AnimationData {
         this.applyRotation(this.current_frame);
     }
 
+    addKeyFrame(bone_name: string, frame_idx: number) {
+        if (!this.keyframes[bone_name]) {
+            this.keyframes[bone_name] = [];
+        }
+
+        this.keyframes[bone_name] = insertIntoSortedArray(this.keyframes[bone_name], frame_idx);
+
+    }
+
+    // generateBoneKeyFrames(bone_name: string) {
+    //     const bones_data = this.data[bone_name];
+
+    //     const velocities: THREE.Vector3[] = [];
+
+    //     for (let i = 1; i < bones_data.length - 1; i++) {
+    //         const q0 = new THREE.Quaternion().fromArray(bones_data[i - 1]);
+    //         const q1 = new THREE.Quaternion().fromArray(bones_data[i]);
+    //         // the rotation difference between two frames
+    //         const v0 = new THREE.Vector3(0, 1, 0);
+
+    //         v0.applyQuaternion(q0);
+
+    //         const v1 = new THREE.Vector3(0, 1, 0);
+
+    //         v1.applyQuaternion(q1);
+
+    //         const v = v1.clone().sub(v0);
+
+    //         velocities.push(v);
+    //     }
+
+    //     const angles = []
+
+    //     for (let i = 0; i < velocities.length - 1; i++) {
+    //         const v0 = velocities[i];
+    //         const v1 = velocities[i + 1];
+
+    //         const angle = v0.angleTo(v1);
+
+    //         angles.push(angle);
+    //     }
+
+    //     console.log(angles);
+    // }
 }
