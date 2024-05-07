@@ -63,6 +63,8 @@ export default class AnimationData {
 
         // then apply the rotation to the bone
         this.applyRotation(this.current_frame);
+
+        this.addKeyFrame(bone_name, this.current_frame);
     }
 
     addKeyFrame(bone_name: string, frame_idx: number) {
@@ -71,7 +73,10 @@ export default class AnimationData {
         }
 
         this.keyframes[bone_name] = insertIntoSortedArray(this.keyframes[bone_name], frame_idx);
+    }
 
+    getBoneKeyFrames(bone_name: string) {
+        return this.keyframes[bone_name] ?? [];
     }
 
     // generateBoneKeyFrames(bone_name: string) {

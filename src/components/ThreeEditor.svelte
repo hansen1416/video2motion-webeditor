@@ -29,8 +29,8 @@
 	let animation_pointer = 0;
 
 	let total_frames = 0;
-
 	let initial_frame = 0;
+	let boneKeyframes: number[] = [];
 
 	let animtionData: AnimationData = new AnimationData();
 
@@ -231,7 +231,12 @@
 		// intersection[0].instanceId;
 
 		// selected bone joints
-		selectedBone = bones[intersection.object.name];
+		const bone_name = intersection.object.name;
+
+		selectedBone = bones[bone_name];
+
+		// get the keyframe info from AnimationData
+		boneKeyframes = animtionData.getBoneKeyFrames(bone_name);
 	}
 
 	$: if (intersects.length > 0) {
@@ -321,6 +326,9 @@
 			selectedBone.name,
 			currentBoneRotation,
 		);
+
+		// get the keyframe info from AnimationData
+		boneKeyframes = animtionData.getBoneKeyFrames(selectedBone.name);
 	}
 </script>
 
@@ -332,6 +340,7 @@
 			min_value={0}
 			max_value={total_frames}
 			initial_value={initial_frame}
+			keyFrames={boneKeyframes}
 			on:update={frameUpdateCallback}
 		/>
 	</div>

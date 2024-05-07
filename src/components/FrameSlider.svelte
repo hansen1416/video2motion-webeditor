@@ -9,6 +9,9 @@
 
 	export let initial_value: number;
 
+	export let keyFrames: number[];
+	// todo add keytfames to the slider
+
 	let value: number = initial_value;
 
 	let slider_input: HTMLInputElement;
@@ -27,7 +30,7 @@
 </script>
 
 <div class="slidecontainer">
-	<div>{value}</div>
+	<div class="marker">{value}</div>
 	<input
 		bind:this={slider_input}
 		type="range"
@@ -37,6 +40,9 @@
 		class="slider"
 		id="myRange"
 	/>
+	{#each keyFrames as value, idx (value)}
+		<div class="keyframe">keyframe</div>
+	{/each}
 </div>
 
 <style>
@@ -55,6 +61,9 @@
 		opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
 		-webkit-transition: 0.2s; /* 0.2 seconds transition on hover */
 		transition: opacity 0.2s;
+		border: 0;
+		padding: 0;
+		margin: 0;
 	}
 
 	/* Mouse-over effects */
@@ -77,5 +86,19 @@
 		height: 25px; /* Slider handle height */
 		background: #04aa6d; /* Green background */
 		cursor: pointer; /* Cursor on hover */
+	}
+
+	.marker {
+		width: 100%;
+		height: 20px;
+		text-align: left;
+	}
+
+	.keyframe {
+		position: absolute;
+		top: 20px;
+		width: 10px;
+		height: 32px;
+		background-color: #fff;
 	}
 </style>

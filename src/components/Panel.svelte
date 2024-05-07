@@ -17,7 +17,7 @@
 	});
 
 	function editRotation(e: Event) {
-		console.log(111, e);
+		// console.log(111, e);
 
 		const value = parseFloat((e.target as HTMLInputElement).value);
 
