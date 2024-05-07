@@ -98,4 +98,9 @@
 		justify-content: flex-start;
 		align-items: center;
 	}
+
+	.panel input {
+		width: 60%;
+		border: 0;
+	}
 </style>

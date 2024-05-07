@@ -93,3 +93,36 @@ export function getMousePosition(event: MouseEvent): { "x": number, "y": number 
     const y: number = -(event.clientY / window.innerHeight) * 2 + 1;
     return { x: x, y: y }
 }
+
+/**
+ * binary search algorithm
+ * @param {Array} arr 
+ * @param {number} target 
+ * @returns 
+ */
+export function binarySearch(arr: number[], target: number) {
+
+    let low = 0;
+    let high = arr.length - 1;
+
+    while (low <= high) {
+        const mid = Math.floor((low + high) / 2);
+        if (arr[mid] === target) return mid; // Found at the middle
+        else if (arr[mid] < target) low = mid + 1; // Search in the right half
+        else high = mid - 1; // Search in the left half
+    }
+    // If not found, return the insertion index (between elements)
+    return low;
+}
+
+/**
+ * insert a number into a sorted array, keeping it sorted
+ * @param {number[]} arr 
+ * @param {number} num 
+ * @returns 
+ */
+export function insertIntoSortedArray(arr: number[], num: number) {
+    const insertionIndex = binarySearch(arr, num);
+    arr.splice(insertionIndex, 0, num);
+    return arr;
+}
