@@ -31,7 +31,16 @@
 
 <div class="slidecontainer">
 	<div class="scales">
-		<div>{value}</div>
+		<div class="scale-panel">
+			<div>{value}</div>
+			<div>
+				<button
+					on:click={() => {
+						dispatch("addKeyframe", { frame_idx: value });
+					}}>Add keyframe</button
+				>
+			</div>
+		</div>
 		<div></div>
 	</div>
 	<input
@@ -95,6 +104,12 @@
 		width: 100%;
 		height: 30px;
 		text-align: left;
+	}
+
+	.scales .scale-panel {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 	}
 
 	.keyframe {

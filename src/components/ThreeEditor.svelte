@@ -326,6 +326,15 @@
 			selectedBone.name,
 			currentBoneRotation,
 		);
+	}
+
+	function addKeyframeCallback(
+		event: ComponentEvents<FrameSlider>["addKeyframe"],
+	) {
+		if (!selectedBone) {
+			return;
+		}
+		animtionData.addKeyFrame(selectedBone.name, event.detail.frame_idx);
 
 		// get the keyframe info from AnimationData
 		boneKeyframes = animtionData.getBoneKeyFrames(selectedBone.name);
@@ -342,6 +351,7 @@
 			initial_value={initial_frame}
 			keyFrames={boneKeyframes}
 			on:update={frameUpdateCallback}
+			on:addKeyframe={addKeyframeCallback}
 		/>
 	</div>
 
