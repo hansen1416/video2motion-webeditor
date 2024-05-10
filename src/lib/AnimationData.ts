@@ -63,8 +63,6 @@ export default class AnimationData {
 
         // then apply the rotation to the bone
         this.applyRotation(this.current_frame);
-
-        this.addKeyFrame(bone_name, this.current_frame);
     }
 
     addKeyFrame(bone_name: string, frame_idx: number) {

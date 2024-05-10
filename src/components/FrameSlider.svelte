@@ -30,7 +30,10 @@
 </script>
 
 <div class="slidecontainer">
-	<div class="marker">{value}</div>
+	<div class="scales">
+		<div>{value}</div>
+		<div></div>
+	</div>
 	<input
 		bind:this={slider_input}
 		type="range"
@@ -88,15 +91,15 @@
 		cursor: pointer; /* Cursor on hover */
 	}
 
-	.marker {
+	.scales {
 		width: 100%;
-		height: 20px;
+		height: 30px;
 		text-align: left;
 	}
 
 	.keyframe {
 		position: absolute;
-		top: 20px;
+		top: 30px;
 		width: 10px;
 		height: 32px;
 		background-color: #fff;
