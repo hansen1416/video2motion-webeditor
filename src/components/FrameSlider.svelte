@@ -37,8 +37,10 @@
 				<button
 					on:click={() => {
 						dispatch("addKeyframe", { frame_idx: value });
-					}}>Add keyframe</button
+					}}
 				>
+					<span>Key</span>
+				</button>
 			</div>
 		</div>
 		<div></div>
@@ -53,7 +55,7 @@
 		id="myRange"
 	/>
 	{#each keyFrames as value, idx (value)}
-		<div class="keyframe">keyframe</div>
+		<div class="keyframe" style="left: {value / max_value}%"></div>
 	{/each}
 </div>
 

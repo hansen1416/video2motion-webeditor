@@ -8,7 +8,11 @@
 	import Panel from "./Panel.svelte";
 	import ThreeScene from "../lib/ThreeScene";
 	import AnimationData from "../lib/AnimationData";
-	import type { AnimationDataObject, ControlType } from "../types";
+	import type {
+		AnimationDataObject,
+		ApplyMethod,
+		ControlType,
+	} from "../types";
 	import Skeleton from "../lib/Skeleton";
 	import { RotationControl, TranslationControl } from "../lib/Controls";
 	import { display_scene, control_type } from "../store";
@@ -260,6 +264,8 @@
 		// get the current bone rotation, will be displayed in the control panel
 		currentBoneRotation = selectedBone.rotation.clone();
 
+		// todo, we also need to deselect bone, and set  currentBoneRotation to empty
+
 		rotationControl.setBone(selectedBone);
 		translationControl.setBone(selectedBone);
 
@@ -314,17 +320,19 @@
 		translationControl.update();
 	}
 
-	function editBoneRotation(event: CustomEvent<THREE.Euler>) {
+	function editBoneRotation(
+		event: CustomEvent<{ euler: THREE.Euler; method: ApplyMethod }>,
+	) {
 		if (!selectedBone) {
 			return;
 		}
+		// edit bone roation, update `currentBoneRotation`
+		currentBoneRotation = event.detail.euler;
 
-		currentBoneRotation = event.detail;
-
-		// todo edit bone roation, update `currentBoneRotation` and animation data
 		animtionData.editBoneFrameRotation(
 			selectedBone.name,
 			currentBoneRotation,
+			event.detail.method,
 		);
 	}
 

@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-import type { QuaternionArray, AnimationDataObject, AnimationFrameDataObject } from "../types";
+import type { QuaternionArray, AnimationDataObject, AnimationFrameDataObject, ApplyMethod } from "../types";
 import { insertIntoSortedArray } from "../utils/ropes";
 
 export default class AnimationData {
@@ -55,7 +55,7 @@ export default class AnimationData {
         }
     }
 
-    editBoneFrameRotation(bone_name: string, rotation: THREE.Euler) {
+    editBoneFrameRotation(bone_name: string, rotation: THREE.Euler, method: ApplyMethod) {
 
         const q = new THREE.Quaternion().setFromEuler(rotation);
         // edit animation data at `current_frame`, on bone `bone_name`
@@ -63,6 +63,9 @@ export default class AnimationData {
 
         // then apply the rotation to the bone
         this.applyRotation(this.current_frame);
+
+        // todo, apply rotation to other frames between two keyframes
+        // if current frame is a keyframe, it should effect two keyframes interval ajacent to it
     }
 
     addKeyFrame(bone_name: string, frame_idx: number) {

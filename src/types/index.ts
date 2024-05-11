@@ -16,3 +16,4 @@ export type AnimationFrameDataObject = { [key: string]: QuaternionArray }
 
 export type ControlType = "rotation" | "translation" | "";
 
+export type ApplyMethod = "linear" | "slerp";

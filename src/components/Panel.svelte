@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher } from "svelte";
 	import * as THREE from "three";
+	import type { ApplyMethod, ControlType } from "../types";
 
 	import Icon from "../icons/Icon.svelte";
 	import { display_scene, control_type } from "../store";
@@ -8,22 +9,34 @@
 
 	export let currentBoneRotation: THREE.Euler;
 
+	let eulerX: number = currentBoneRotation.x;
+	let eulerY: number = currentBoneRotation.y;
+	let eulerZ: number = currentBoneRotation.z;
+
+	// when currentBoneRotation change, update eulerX, eulerY, eulerZ
+	$: if (currentBoneRotation) {
+		eulerX = currentBoneRotation.x;
+		eulerY = currentBoneRotation.y;
+		eulerZ = currentBoneRotation.z;
+	}
+
 	const dispatch = createEventDispatcher();
 
-	let _controlType: "rotation" | "translation" | "" = "";
+	let _controlType: ControlType = "";
 
 	control_type.subscribe((value) => {
 		_controlType = value;
 	});
 
-	function editRotation(e: Event) {
-		// console.log(111, e);
+	function editRotation(interpolation: ApplyMethod) {
+		currentBoneRotation.x = eulerX;
+		currentBoneRotation.y = eulerY;
+		currentBoneRotation.z = eulerZ;
 
-		const value = parseFloat((e.target as HTMLInputElement).value);
-
-		currentBoneRotation.x = value;
-
-		dispatch("edit_bone_rotation", currentBoneRotation);
+		dispatch("edit_bone_rotation", {
+			euler: currentBoneRotation,
+			method: interpolation,
+		});
 	}
 </script>
 
@@ -70,18 +83,27 @@
 	>
 		<Icon name="rotate" />
 	</button>
-	<label>
-		<span>x:</span>
-		<input value={currentBoneRotation.x} on:change={editRotation} />
-	</label>
-	<label>
-		<span>y:</span>
-		<input value={currentBoneRotation.y} on:change={editRotation} />
-	</label>
-	<label>
-		<span>z:</span>
-		<input value={currentBoneRotation.z} on:change={editRotation} />
-	</label>
+	{#if currentBoneRotation}
+		<label>
+			<span>x:</span>
+			<input bind:value={eulerX} />
+		</label>
+		<label>
+			<span>y:</span>
+			<input bind:value={eulerY} />
+		</label>
+		<label>
+			<span>z:</span>
+			<input bind:value={eulerZ} />
+		</label>
+		<button
+			on:click={() => {
+				editRotation("linear");
+			}}
+		>
+			<span>apply linear</span>
+		</button>
+	{/if}
 </section>
 
 <style>
