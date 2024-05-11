@@ -10,7 +10,6 @@
 	export let initial_value: number;
 
 	export let keyFrames: number[];
-	// todo add keytfames to the slider
 
 	let value: number = initial_value;
 

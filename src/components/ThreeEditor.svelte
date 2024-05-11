@@ -264,7 +264,7 @@
 		// get the current bone rotation, will be displayed in the control panel
 		currentBoneRotation = selectedBone.rotation.clone();
 
-		// todo, we also need to deselect bone, and set  currentBoneRotation to empty
+		// todo, we also need to de-select bone, and set  currentBoneRotation to empty
 
 		rotationControl.setBone(selectedBone);
 		translationControl.setBone(selectedBone);
