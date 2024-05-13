@@ -15,7 +15,7 @@
 	} from "../types";
 	import Skeleton from "../lib/Skeleton";
 	import { RotationControl, TranslationControl } from "../lib/Controls";
-	import { display_scene, control_type } from "../store";
+	import { display_scene, control_type, currentRotation } from "../store";
 	import {
 		loadGLTF,
 		loadJSON,
@@ -62,8 +62,6 @@
 	let drag_start: THREE.Vector2 = new THREE.Vector2();
 
 	let allDone: boolean = false;
-
-	let currentBoneRotation: THREE.Euler = new THREE.Euler();
 
 	function animate() {
 		if (threeScene) {
@@ -229,6 +227,7 @@
 		intersection = getNamedIntersects(intersects);
 
 		if (intersection === null) {
+			// todo maybe de-select bone here, set things to empty
 			return;
 		}
 
@@ -248,7 +247,7 @@
 
 		if (intersection) {
 			// todo could be bones, rotations, translations
-			console.log(intersection.object.name);
+			// console.log(intersection.object.name);
 
 			skeleton.highlightBone(
 				skeleton.getBoneIndex(intersection.object.name),
@@ -262,7 +261,7 @@
 
 	$: if (selectedBone) {
 		// get the current bone rotation, will be displayed in the control panel
-		currentBoneRotation = selectedBone.rotation.clone();
+		currentRotation.set(selectedBone.rotation.clone());
 
 		// todo, we also need to de-select bone, and set  currentBoneRotation to empty
 
@@ -327,11 +326,11 @@
 			return;
 		}
 		// edit bone roation, update `currentBoneRotation`
-		currentBoneRotation = event.detail.euler;
+		const rot = event.detail.euler;
 
 		animtionData.editBoneFrameRotation(
 			selectedBone.name,
-			currentBoneRotation,
+			rot,
 			event.detail.method,
 		);
 	}
@@ -363,7 +362,7 @@
 		/>
 	</div>
 
-	<Panel bind:currentBoneRotation on:edit_bone_rotation={editBoneRotation} />
+	<Panel on:edit_bone_rotation={editBoneRotation} />
 </section>
 
 {#if allDone}

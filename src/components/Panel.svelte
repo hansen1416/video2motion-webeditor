@@ -4,21 +4,19 @@
 	import type { ApplyMethod, ControlType } from "../types";
 
 	import Icon from "../icons/Icon.svelte";
-	import { display_scene, control_type } from "../store";
+	import { display_scene, control_type, currentRotation } from "../store";
 	import WebStorage from "../lib/WebStorage";
 
-	export let currentBoneRotation: THREE.Euler;
+	let eulerX: number = 0;
+	let eulerY: number = 0;
+	let eulerZ: number = 0;
 
-	let eulerX: number = currentBoneRotation.x;
-	let eulerY: number = currentBoneRotation.y;
-	let eulerZ: number = currentBoneRotation.z;
-
-	// when currentBoneRotation change, update eulerX, eulerY, eulerZ
-	$: if (currentBoneRotation) {
-		eulerX = currentBoneRotation.x;
-		eulerY = currentBoneRotation.y;
-		eulerZ = currentBoneRotation.z;
-	}
+	// when currentRotation change, update eulerX, eulerY, eulerZ
+	currentRotation.subscribe((value: THREE.Euler) => {
+		eulerX = value.x;
+		eulerY = value.y;
+		eulerZ = value.z;
+	});
 
 	const dispatch = createEventDispatcher();
 
@@ -29,12 +27,10 @@
 	});
 
 	function editRotation(interpolation: ApplyMethod) {
-		currentBoneRotation.x = eulerX;
-		currentBoneRotation.y = eulerY;
-		currentBoneRotation.z = eulerZ;
+		const rot = new THREE.Euler(eulerX, eulerY, eulerZ);
 
 		dispatch("edit_bone_rotation", {
-			euler: currentBoneRotation,
+			euler: rot,
 			method: interpolation,
 		});
 	}
@@ -83,27 +79,25 @@
 	>
 		<Icon name="rotate" />
 	</button>
-	{#if currentBoneRotation}
-		<label>
-			<span>x:</span>
-			<input bind:value={eulerX} />
-		</label>
-		<label>
-			<span>y:</span>
-			<input bind:value={eulerY} />
-		</label>
-		<label>
-			<span>z:</span>
-			<input bind:value={eulerZ} />
-		</label>
-		<button
-			on:click={() => {
-				editRotation("linear");
-			}}
-		>
-			<span>apply linear</span>
-		</button>
-	{/if}
+	<label>
+		<span>x:</span>
+		<input bind:value={eulerX} />
+	</label>
+	<label>
+		<span>y:</span>
+		<input bind:value={eulerY} />
+	</label>
+	<label>
+		<span>z:</span>
+		<input bind:value={eulerZ} />
+	</label>
+	<button
+		on:click={() => {
+			editRotation("linear");
+		}}
+	>
+		<span>apply linear</span>
+	</button>
 </section>
 
 <style>
