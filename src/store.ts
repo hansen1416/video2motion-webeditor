@@ -6,4 +6,4 @@ export const display_scene = writable(WebStorage.read("display_scene") || "mesh"
 
 export const control_type = writable(WebStorage.read("control_type") || "rotation");
 
-export const currentRotation = writable(new THREE.Euler(0, 0, 0));
+export const currentRotation = writable<THREE.Euler | null>(null);

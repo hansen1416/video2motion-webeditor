@@ -11,11 +11,19 @@
 	let eulerY: number = 0;
 	let eulerZ: number = 0;
 
+	let showEulerInputs: boolean = false;
+
 	// when currentRotation change, update eulerX, eulerY, eulerZ
-	currentRotation.subscribe((value: THREE.Euler) => {
-		eulerX = value.x;
-		eulerY = value.y;
-		eulerZ = value.z;
+	currentRotation.subscribe((value: THREE.Euler | null) => {
+		if (value) {
+			eulerX = value.x;
+			eulerY = value.y;
+			eulerZ = value.z;
+
+			showEulerInputs = true;
+		} else {
+			showEulerInputs = false;
+		}
 	});
 
 	const dispatch = createEventDispatcher();
@@ -79,25 +87,27 @@
 	>
 		<Icon name="rotate" />
 	</button>
-	<label>
-		<span>x:</span>
-		<input bind:value={eulerX} />
-	</label>
-	<label>
-		<span>y:</span>
-		<input bind:value={eulerY} />
-	</label>
-	<label>
-		<span>z:</span>
-		<input bind:value={eulerZ} />
-	</label>
-	<button
-		on:click={() => {
-			editRotation("linear");
-		}}
-	>
-		<span>apply linear</span>
-	</button>
+	{#if showEulerInputs}
+		<label>
+			<span>x:</span>
+			<input bind:value={eulerX} />
+		</label>
+		<label>
+			<span>y:</span>
+			<input bind:value={eulerY} />
+		</label>
+		<label>
+			<span>z:</span>
+			<input bind:value={eulerZ} />
+		</label>
+		<button
+			on:click={() => {
+				editRotation("linear");
+			}}
+		>
+			<span>apply linear</span>
+		</button>
+	{/if}
 </section>
 
 <style>

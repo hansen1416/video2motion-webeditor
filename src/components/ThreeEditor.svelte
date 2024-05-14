@@ -24,6 +24,34 @@
 		getMousePosition,
 	} from "../utils/ropes";
 
+	const BoneNames = [
+		"Hips",
+		"Spine",
+		"Spine1",
+		"Spine2",
+		"Neck",
+		"Head",
+		"HeadTop_End",
+		"LeftShoulder",
+		"LeftArm",
+		"LeftForeArm",
+		"LeftHand",
+		"RightShoulder",
+		"RightArm",
+		"RightForeArm",
+		"RightHand",
+		"LeftUpLeg",
+		"LeftLeg",
+		"LeftFoot",
+		"LeftToeBase",
+		"LeftToe_End",
+		"RightUpLeg",
+		"RightLeg",
+		"RightFoot",
+		"RightToeBase",
+		"RightToe_End",
+	];
+
 	let canvas: HTMLCanvasElement;
 
 	let threeScene: ThreeScene;
@@ -51,6 +79,8 @@
 	let intersection: THREE.Intersection | null = null;
 
 	let skeleton = new Skeleton();
+
+	// todo use a store for `selectedBone`
 	let selectedBone: THREE.Bone | null = null;
 	let rotationControl = new RotationControl();
 	let translationControl = new TranslationControl();
@@ -198,17 +228,11 @@
 	function onMouseMove(event: MouseEvent) {
 		event.preventDefault();
 
-		const current_pos = getMousePosition(event);
+		const currentPos = getMousePosition(event);
 
-		mouse.copy(current_pos);
+		mouse.copy(currentPos);
 
 		// todo, use control to edit bone rotation
-		// if (in_dragging && intersection) {
-		// 	const drag_vector = new THREE.Vector2(
-		// 		current_pos.x - drag_start.x,
-		// 		current_pos.y - drag_start.y,
-		// 	);
-		// }
 	}
 
 	function onMouseUp(event: MouseEvent) {
@@ -227,19 +251,25 @@
 		intersection = getNamedIntersects(intersects);
 
 		if (intersection === null) {
-			// todo maybe de-select bone here, set things to empty
+			// de-select bone, set to empty
+			selectedBone = null;
 			return;
 		}
 
 		// intersection[0].instanceId;
 
 		// selected bone joints
-		const bone_name = intersection.object.name;
+		const object_name = intersection.object.name;
 
-		selectedBone = bones[bone_name];
+		// check if bone_name is of type BoneName
+		if (BoneNames.includes(object_name)) {
+			selectedBone = bones[object_name];
 
-		// get the keyframe info from AnimationData
-		boneKeyframes = animtionData.getBoneKeyFrames(bone_name);
+			// get the keyframe info from AnimationData
+			boneKeyframes = animtionData.getBoneKeyFrames(object_name);
+		} else {
+			selectedBone = null;
+		}
 	}
 
 	$: if (intersects.length > 0) {
@@ -279,10 +309,17 @@
 		} else if (_controlType === "") {
 			control_type.set("rotation");
 		}
+	} else {
+		currentRotation.set(null);
+
+		rotationControl.setBone(null);
+		translationControl.setBone(null);
+
+		control_type.set("");
 	}
 
-	control_type.subscribe((value: "rotation" | "translation") => {
-		_controlType = value as "rotation" | "translation";
+	control_type.subscribe((value: ControlType) => {
+		_controlType = value;
 
 		if (value === "rotation") {
 			translationControl.hide();

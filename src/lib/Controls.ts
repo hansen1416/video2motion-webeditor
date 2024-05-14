@@ -27,7 +27,7 @@ abstract class BaseControl {
         }
     }
 
-    setBone(bone: THREE.Bone) {
+    setBone(bone: THREE.Bone | null) {
         this.bone = bone;
 
         this.update();
