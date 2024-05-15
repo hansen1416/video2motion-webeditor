@@ -1,10 +1,15 @@
 <script lang="ts">
 	import { createEventDispatcher } from "svelte";
 	import * as THREE from "three";
-	import type { ApplyMethod, ControlType } from "../types";
+	import type { ApplyMethod, ControlType, DiaplayScene } from "../types";
 
 	import Icon from "../icons/Icon.svelte";
-	import { display_scene, control_type, currentRotation } from "../store";
+	import {
+		displayScene,
+		controlType,
+		currentRotation,
+		selectedBone,
+	} from "../store";
 	import WebStorage from "../lib/WebStorage";
 
 	let eulerX: number = 0;
@@ -30,9 +35,29 @@
 
 	let _controlType: ControlType = "";
 
-	control_type.subscribe((value) => {
+	controlType.subscribe((value) => {
 		_controlType = value;
 	});
+
+	function swicthDisplayScene(value: DiaplayScene) {
+		displayScene.set(value);
+		WebStorage.save("display_scene", value);
+		if (value === "mesh") {
+			selectedBone.set(null);
+		}
+	}
+
+	function swicthControlType(value: ControlType) {
+		if (value === _controlType) {
+			controlType.set("");
+			// hide the control when swicth to empty
+			selectedBone.set(null);
+		} else {
+			controlType.set(value);
+		}
+
+		WebStorage.save("control_type", value);
+	}
 
 	function editRotation(interpolation: ApplyMethod) {
 		const rot = new THREE.Euler(eulerX, eulerY, eulerZ);
@@ -47,42 +72,28 @@
 <section class="panel">
 	<button
 		on:click={() => {
-			display_scene.set("skeleton");
-			WebStorage.save("display_scene", "skeleton");
+			swicthDisplayScene("skeleton");
 		}}
 	>
 		<Icon name="bones" />
 	</button>
 	<button
 		on:click={() => {
-			display_scene.set("mesh");
-			WebStorage.save("display_scene", "mesh");
+			swicthDisplayScene("mesh");
 		}}
 	>
 		<Icon name="mesh" />
 	</button>
 	<button
 		on:click={() => {
-			if (_controlType === "translation") {
-				control_type.set("");
-			} else {
-				control_type.set("translation");
-			}
-
-			WebStorage.save("control_type", "translation");
+			swicthControlType("translation");
 		}}
 	>
 		<Icon name="axis" />
 	</button>
 	<button
 		on:click={() => {
-			if (_controlType === "rotation") {
-				control_type.set("");
-			} else {
-				control_type.set("rotation");
-			}
-
-			WebStorage.save("control_type", "rotation");
+			swicthControlType("rotation");
 		}}
 	>
 		<Icon name="rotate" />

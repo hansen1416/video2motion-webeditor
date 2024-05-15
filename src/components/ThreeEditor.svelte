@@ -15,7 +15,12 @@
 	} from "../types";
 	import Skeleton from "../lib/Skeleton";
 	import { RotationControl, TranslationControl } from "../lib/Controls";
-	import { display_scene, control_type, currentRotation } from "../store";
+	import {
+		displayScene,
+		controlType,
+		currentRotation,
+		selectedBone,
+	} from "../store";
 	import {
 		loadGLTF,
 		loadJSON,
@@ -80,8 +85,7 @@
 
 	let skeleton = new Skeleton();
 
-	// todo use a store for `selectedBone`
-	let selectedBone: THREE.Bone | null = null;
+	let _selectedBone: THREE.Object3D | null = null;
 	let rotationControl = new RotationControl();
 	let translationControl = new TranslationControl();
 
@@ -179,7 +183,7 @@
 			animate();
 
 			// this subscribe must happen after the scene is loaded
-			display_scene.subscribe((value) => {
+			displayScene.subscribe((value) => {
 				if (value === "skeleton") {
 					skeleton.show();
 
@@ -252,7 +256,6 @@
 
 		if (intersection === null) {
 			// de-select bone, set to empty
-			selectedBone = null;
 			return;
 		}
 
@@ -263,12 +266,10 @@
 
 		// check if bone_name is of type BoneName
 		if (BoneNames.includes(object_name)) {
-			selectedBone = bones[object_name];
+			selectedBone.set(bones[object_name]);
 
 			// get the keyframe info from AnimationData
 			boneKeyframes = animtionData.getBoneKeyFrames(object_name);
-		} else {
-			selectedBone = null;
 		}
 	}
 
@@ -289,36 +290,41 @@
 		skeleton.highlightBone(-1);
 	}
 
-	$: if (selectedBone) {
-		// get the current bone rotation, will be displayed in the control panel
-		currentRotation.set(selectedBone.rotation.clone());
+	selectedBone.subscribe((value: THREE.Object3D | null) => {
+		_selectedBone = value;
 
-		// todo, we also need to de-select bone, and set  currentBoneRotation to empty
+		if (value) {
+			// get the current bone rotation, will be displayed in the control panel
+			currentRotation.set(value.rotation.clone());
 
-		rotationControl.setBone(selectedBone);
-		translationControl.setBone(selectedBone);
+			rotationControl.setBone(value as THREE.Bone);
+			translationControl.setBone(value as THREE.Bone);
 
-		if (_controlType === "rotation") {
-			translationControl.hide();
-			rotationControl.update();
-			rotationControl.show();
-		} else if (_controlType === "translation") {
-			rotationControl.hide();
-			translationControl.update();
-			translationControl.show();
-		} else if (_controlType === "") {
-			control_type.set("rotation");
+			if (_controlType === "rotation") {
+				translationControl.hide();
+				rotationControl.update();
+				rotationControl.show();
+			} else if (_controlType === "translation") {
+				rotationControl.hide();
+				translationControl.update();
+				translationControl.show();
+			} else if (_controlType === "") {
+				controlType.set("rotation");
+			}
+		} else {
+			// de-select bone, and set  currentBoneRotation to empty
+			currentRotation.set(null);
+
+			rotationControl.setBone(null);
+			translationControl.setBone(null);
+
+			controlType.set("");
 		}
-	} else {
-		currentRotation.set(null);
+	});
 
-		rotationControl.setBone(null);
-		translationControl.setBone(null);
-
-		control_type.set("");
-	}
-
-	control_type.subscribe((value: ControlType) => {
+	controlType.subscribe((value: ControlType) => {
+		// swicth between rotation and translation
+		// this will not affect visibility of the control, which controled by selectedBone
 		_controlType = value;
 
 		if (value === "rotation") {
@@ -333,8 +339,6 @@
 			rotationControl.hide();
 			translationControl.hide();
 		}
-
-		// todo check if the bone is selected, if yes, switch the control
 	});
 
 	/**
@@ -359,14 +363,14 @@
 	function editBoneRotation(
 		event: CustomEvent<{ euler: THREE.Euler; method: ApplyMethod }>,
 	) {
-		if (!selectedBone) {
+		if (!_selectedBone) {
 			return;
 		}
 		// edit bone roation, update `currentBoneRotation`
 		const rot = event.detail.euler;
 
 		animtionData.editBoneFrameRotation(
-			selectedBone.name,
+			_selectedBone.name,
 			rot,
 			event.detail.method,
 		);
@@ -375,13 +379,13 @@
 	function addKeyframeCallback(
 		event: ComponentEvents<FrameSlider>["addKeyframe"],
 	) {
-		if (!selectedBone) {
+		if (!_selectedBone) {
 			return;
 		}
-		animtionData.addKeyFrame(selectedBone.name, event.detail.frame_idx);
+		animtionData.addKeyFrame(_selectedBone.name, event.detail.frame_idx);
 
 		// get the keyframe info from AnimationData
-		boneKeyframes = animtionData.getBoneKeyFrames(selectedBone.name);
+		boneKeyframes = animtionData.getBoneKeyFrames(_selectedBone.name);
 	}
 </script>
 

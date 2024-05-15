@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { control_type } from "../store";
+	import { controlType } from "../store";
 
 	export let size: number = 24;
 	export let color: string = "#fff";
 
-	control_type.subscribe((value) => {
+	controlType.subscribe((value) => {
 		if (value === "rotation") {
 			color = "#ccc";
 		} else {

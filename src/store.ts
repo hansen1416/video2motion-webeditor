@@ -1,9 +1,14 @@
-import { writable } from 'svelte/store';
-import WebStorage from './lib/WebStorage';
 import * as THREE from 'three';
+import { writable } from 'svelte/store';
 
-export const display_scene = writable(WebStorage.read("display_scene") || "mesh");
+import type { DiaplayScene, ControlType } from './types/index';
+import WebStorage from './lib/WebStorage';
 
-export const control_type = writable(WebStorage.read("control_type") || "rotation");
+
+export const displayScene = writable<DiaplayScene>(WebStorage.read("display_scene") || "mesh");
+
+export const controlType = writable<ControlType>(WebStorage.read("control_type") || "rotation");
 
 export const currentRotation = writable<THREE.Euler | null>(null);
+
+export const selectedBone = writable<THREE.Object3D | null>(null)
