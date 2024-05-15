@@ -366,12 +366,11 @@
 		if (!_selectedBone) {
 			return;
 		}
-		// edit bone roation, update `currentBoneRotation`
-		const rot = event.detail.euler;
 
+		// update the bone rotation at current frame
 		animtionData.editBoneFrameRotation(
 			_selectedBone.name,
-			rot,
+			event.detail.euler,
 			event.detail.method,
 		);
 	}

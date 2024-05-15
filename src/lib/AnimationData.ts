@@ -3,6 +3,81 @@ import * as THREE from "three";
 import type { QuaternionArray, AnimationDataObject, AnimationFrameDataObject, ApplyMethod } from "../types";
 import { insertIntoSortedArray } from "../utils/ropes";
 
+/**
+ * Searches for the element in the array and returns the adjacent elements' indices.
+
+    If x is less than arr[0], returns - 1, 0.
+    If x is greater than arr[-1], returns len(arr) - 1, len(arr).
+    If x is in the array, returns the index of the element and the next element index.
+        Otherwise, returns the indices of the elements between which x should be inserted.
+
+    Args:
+        arr: Sorted list of integers.
+        low: Start index.
+        high: End index.
+        x: Target element.
+
+    Returns:
+        low: Index of the element less than or equal to x.
+        high: Index of the element greater than x.
+
+ * @param arr 
+ * @param low 
+ * @param high 
+ * @param x 
+ * @returns 
+ */
+function binarySearchModified(arr: [], low: number, high: number, x: number) {
+
+
+
+
+    while (low <= high) {
+        const mid = Math.floor((low + high) / 2);
+
+        // Check if x is present at mid
+        if (arr[mid] === x) {
+            if (mid === 0) {
+                return [mid, mid + 1];
+            } else {
+                return [mid - 1, mid];
+            }
+        }
+
+        // If x is greater, search right half and update low
+        if (arr[mid] < x) {
+            low = mid + 1;
+        }
+
+        // If x is smaller, search left half and update high (important change)
+        else {
+            high = mid - 1;
+        }
+    }
+
+    if (low > arr.length - 1) {
+        return [arr.length - 2, arr.length - 1];
+    }
+
+    if (high < 0) {
+        return [0, 1];
+    }
+
+    // If we reach here, then the element was not present
+    // Check if x is smaller than the first element
+    if (x < arr[low]) {
+        return [low - 1, low];
+    }
+
+    // Check if x is greater than the last element
+    if (x > arr[high]) {
+        return [high, high + 1];
+    }
+
+    // Target is between elements at high and low (modified part)
+    return [low, high];
+}
+
 export default class AnimationData {
 
     total_frames: number = 0;
@@ -65,7 +140,16 @@ export default class AnimationData {
         this.applyRotation(this.current_frame);
 
         // todo, apply rotation to other frames between two keyframes
-        // if current frame is a keyframe, it should effect two keyframes interval ajacent to it
+        // if current frame is a keyframe, it should effect two keyframes interval adjacent to it
+
+        let boneKeyFrame = this.getBoneKeyFrames(bone_name);
+
+        boneKeyFrame = [0].concat(boneKeyFrame, [this.total_frames - 1]);
+
+
+
+
+
     }
 
     addKeyFrame(bone_name: string, frame_idx: number) {
@@ -80,39 +164,15 @@ export default class AnimationData {
         return this.keyframes[bone_name] ?? [];
     }
 
-    // generateBoneKeyFrames(bone_name: string) {
-    //     const bones_data = this.data[bone_name];
+    #getAdjacentKeyFrames(bone_name: string, frame_idx: number) {
+        const keyframes = this.getBoneKeyFrames(bone_name);
+        const idx = keyframes.indexOf(frame_idx);
+        if (idx === -1) {
+            return [];
+        }
 
-    //     const velocities: THREE.Vector3[] = [];
+        return [keyframes[idx - 1], keyframes[idx + 1]];
+    }
 
-    //     for (let i = 1; i < bones_data.length - 1; i++) {
-    //         const q0 = new THREE.Quaternion().fromArray(bones_data[i - 1]);
-    //         const q1 = new THREE.Quaternion().fromArray(bones_data[i]);
-    //         // the rotation difference between two frames
-    //         const v0 = new THREE.Vector3(0, 1, 0);
 
-    //         v0.applyQuaternion(q0);
-
-    //         const v1 = new THREE.Vector3(0, 1, 0);
-
-    //         v1.applyQuaternion(q1);
-
-    //         const v = v1.clone().sub(v0);
-
-    //         velocities.push(v);
-    //     }
-
-    //     const angles = []
-
-    //     for (let i = 0; i < velocities.length - 1; i++) {
-    //         const v0 = velocities[i];
-    //         const v1 = velocities[i + 1];
-
-    //         const angle = v0.angleTo(v1);
-
-    //         angles.push(angle);
-    //     }
-
-    //     console.log(angles);
-    // }
 }
