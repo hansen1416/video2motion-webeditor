@@ -264,7 +264,7 @@
 		// selected bone joints
 		const object_name = intersection.object.name;
 
-		// check if bone_name is of type BoneName
+		// check if object_name is of type BoneName
 		if (BoneNames.includes(object_name)) {
 			selectedBone.set(bones[object_name]);
 
@@ -381,6 +381,7 @@
 		if (!_selectedBone) {
 			return;
 		}
+
 		animtionData.addKeyFrame(_selectedBone.name, event.detail.frame_idx);
 
 		// get the keyframe info from AnimationData

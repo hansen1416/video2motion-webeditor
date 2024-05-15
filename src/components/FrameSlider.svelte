@@ -1,5 +1,13 @@
 <script lang="ts">
 	import { onDestroy, onMount, createEventDispatcher } from "svelte";
+	import * as noUiSlider from "nouislider";
+	import "nouislider/dist/nouislider.css";
+	import { slide } from "svelte/transition";
+
+	interface SlierHTMLElement extends HTMLElement {
+		// Add your custom properties here
+		noUiSlider: any;
+	}
 
 	const dispatch = createEventDispatcher();
 
@@ -11,16 +19,34 @@
 
 	export let keyFrames: number[];
 
-	let value: number = initial_value;
+	let current_value: number = initial_value;
 
-	let slider_input: HTMLInputElement;
+	let slider: SlierHTMLElement;
 
 	onMount(() => {
-		slider_input.oninput = (e: Event) => {
-			value = parseInt((e.target as HTMLInputElement).value);
+		// todo update range.min and max
+		noUiSlider.create(slider, {
+			start: [0],
+			tooltips: {
+				to: function (value) {
+					return ~~value;
+				},
+			},
+			range: {
+				min: 0,
+				max: 100,
+			},
+			step: 1,
+			pips: {
+				mode: "steps" as any,
+				density: 1,
+			},
+		});
 
-			dispatch("update", { frame_idx: value });
-		};
+		slider.noUiSlider.on("change.one", function (values: number[]) {
+			current_value = ~~values[0];
+			dispatch("update", { frame_idx: current_value });
+		});
 	});
 
 	onDestroy(() => {
@@ -31,11 +57,10 @@
 <div class="slidecontainer">
 	<div class="scales">
 		<div class="scale-panel">
-			<div>{value}</div>
 			<div>
 				<button
 					on:click={() => {
-						dispatch("addKeyframe", { frame_idx: value });
+						dispatch("addKeyframe", { frame_idx: current_value });
 					}}
 				>
 					<span>Key</span>
@@ -44,17 +69,9 @@
 		</div>
 		<div></div>
 	</div>
-	<input
-		bind:this={slider_input}
-		type="range"
-		min={min_value}
-		max={max_value}
-		{value}
-		class="slider"
-		id="myRange"
-	/>
+	<div bind:this={slider}></div>
 	{#each keyFrames as value, idx (value)}
-		<div class="keyframe" style="left: {value / max_value}%"></div>
+		<div class="keyframe" style="left: {(value / max_value) * 100}%"></div>
 	{/each}
 </div>
 
@@ -118,6 +135,6 @@
 		top: 30px;
 		width: 10px;
 		height: 32px;
-		background-color: #fff;
+		background-color: #000;
 	}
 </style>

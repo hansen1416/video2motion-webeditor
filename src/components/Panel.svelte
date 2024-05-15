@@ -50,8 +50,6 @@
 	function swicthControlType(value: ControlType) {
 		if (value === _controlType) {
 			controlType.set("");
-			// hide the control when swicth to empty
-			selectedBone.set(null);
 		} else {
 			controlType.set(value);
 		}
