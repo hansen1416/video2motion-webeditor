@@ -387,6 +387,19 @@
 		// get the keyframe info from AnimationData
 		boneKeyframes = animtionData.getBoneKeyFrames(_selectedBone.name);
 	}
+
+	function deleteKeyframeCallback(
+		event: ComponentEvents<FrameSlider>["deleteKeyframe"],
+	) {
+		if (!_selectedBone) {
+			return;
+		}
+
+		animtionData.deleteKeyFrame(_selectedBone.name, event.detail.frame_idx);
+
+		// get the keyframe info from AnimationData
+		boneKeyframes = animtionData.getBoneKeyFrames(_selectedBone.name);
+	}
 </script>
 
 <section class="three-editor">
@@ -400,6 +413,7 @@
 			keyFrames={boneKeyframes}
 			on:update={frameUpdateCallback}
 			on:addKeyframe={addKeyframeCallback}
+			on:deleteKeyframe={deleteKeyframeCallback}
 		/>
 	</div>
 

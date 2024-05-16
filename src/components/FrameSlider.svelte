@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { onDestroy, onMount, createEventDispatcher } from "svelte";
+	import * as THREE from "three";
 	import * as noUiSlider from "nouislider";
 	import "nouislider/dist/nouislider.css";
-	import { slide } from "svelte/transition";
+	import { selectedBone } from "../store";
 
 	interface SlierHTMLElement extends HTMLElement {
-		// Add your custom properties here
 		noUiSlider: any;
 	}
 
@@ -23,6 +23,10 @@
 
 	let slider: SlierHTMLElement;
 
+	let _selectedBone: THREE.Object3D | null = null;
+
+	let deleteFrameIdx: number | null = null;
+
 	onMount(() => {
 		// todo update range.min and max
 		noUiSlider.create(slider, {
@@ -36,7 +40,7 @@
 				min: 0,
 				max: 100,
 			},
-			step: 1,
+			// step: 1,
 			pips: {
 				mode: "steps" as any,
 				density: 1,
@@ -49,8 +53,28 @@
 		});
 	});
 
+	$: if (
+		min_value !== undefined &&
+		max_value !== undefined &&
+		slider !== undefined &&
+		slider.noUiSlider !== undefined
+	) {
+		slider.noUiSlider.updateOptions({
+			range: {
+				min: min_value,
+				max: max_value,
+			},
+		});
+	}
+
 	onDestroy(() => {
-		// console.log("destroyed");
+		if (slider) {
+			slider.noUiSlider.destroy();
+		}
+	});
+
+	selectedBone.subscribe((value: THREE.Object3D | null) => {
+		_selectedBone = value;
 	});
 </script>
 
@@ -62,8 +86,21 @@
 					on:click={() => {
 						dispatch("addKeyframe", { frame_idx: current_value });
 					}}
+					disabled={!_selectedBone}
 				>
-					<span>Key</span>
+					<span>Add Keyframe</span>
+				</button>
+				<button
+					on:click={() => {
+						dispatch("deleteKeyframe", {
+							frame_idx: deleteFrameIdx,
+						});
+						// do this in a callback is more proper, settle for now
+						deleteFrameIdx = null;
+					}}
+					disabled={deleteFrameIdx === null}
+				>
+					<span>Delete Keyframe</span>
 				</button>
 			</div>
 		</div>
@@ -71,7 +108,16 @@
 	</div>
 	<div bind:this={slider}></div>
 	{#each keyFrames as value, idx (value)}
-		<div class="keyframe" style="left: {(value / max_value) * 100}%"></div>
+		<button
+			on:click={() => {
+				deleteFrameIdx = value;
+			}}
+		>
+			<div
+				class="keyframe"
+				style="left: {(value / max_value) * 100}%"
+			></div>
+		</button>
 	{/each}
 </div>
 
@@ -132,9 +178,9 @@
 
 	.keyframe {
 		position: absolute;
-		top: 30px;
+		top: 20px;
 		width: 10px;
-		height: 32px;
+		height: 30px;
 		background-color: #000;
 	}
 </style>

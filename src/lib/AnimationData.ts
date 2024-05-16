@@ -116,6 +116,10 @@ export default class AnimationData {
         return frame_data;
     }
 
+    getBoneKeyFrames(bone_name: string): number[] {
+        return this.keyframes[bone_name] ?? [];
+    }
+
     applyRotation(frame_idx: number) {
 
         this.current_frame = frame_idx;
@@ -145,23 +149,30 @@ export default class AnimationData {
         let boneKeyFrame = this.getBoneKeyFrames(bone_name);
 
         boneKeyFrame = [0].concat(boneKeyFrame, [this.total_frames - 1]);
-
-
-
-
-
     }
+
 
     addKeyFrame(bone_name: string, frame_idx: number) {
-        if (!this.keyframes[bone_name]) {
-            this.keyframes[bone_name] = [];
+        let boneKeyFrame = this.getBoneKeyFrames(bone_name);
+
+        // check if frame_idx is already a keyframe
+        if (boneKeyFrame.includes(frame_idx)) {
+            return;
         }
 
-        this.keyframes[bone_name] = insertIntoSortedArray(this.keyframes[bone_name], frame_idx);
+        this.keyframes[bone_name] = insertIntoSortedArray(boneKeyFrame, frame_idx);
     }
 
-    getBoneKeyFrames(bone_name: string) {
-        return this.keyframes[bone_name] ?? [];
+
+    deleteKeyFrame(bone_name: string, frame_idx: number) {
+        let boneKeyFrame = this.getBoneKeyFrames(bone_name);
+
+        const idx = boneKeyFrame.indexOf(frame_idx);
+
+        if (idx !== -1) {
+            console.log('deleting keyframe', frame_idx, idx);
+            this.keyframes[bone_name].splice(idx, 1);
+        }
     }
 
     #getAdjacentKeyFrames(bone_name: string, frame_idx: number) {
