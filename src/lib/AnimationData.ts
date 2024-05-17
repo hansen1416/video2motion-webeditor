@@ -27,20 +27,22 @@ import { insertIntoSortedArray } from "../utils/ropes";
  * @param x 
  * @returns 
  */
-function binarySearchModified(arr: [], low: number, high: number, x: number) {
-
-
-
+function binarySearchModified(arr: number[], low: number, high: number, x: number) {
 
     while (low <= high) {
         const mid = Math.floor((low + high) / 2);
 
         // Check if x is present at mid
         if (arr[mid] === x) {
+
             if (mid === 0) {
+                // if mid is 0, return 0 and 1
                 return [mid, mid + 1];
-            } else {
+            } else if (mid === arr.length - 1) {
+                // if mid is last element, return last - 1 and last
                 return [mid - 1, mid];
+            } else {
+                return [mid - 1, mid + 1];
             }
         }
 
@@ -149,7 +151,37 @@ export default class AnimationData {
         let boneKeyFrame = this.getBoneKeyFrames(bone_name);
 
         boneKeyFrame = [0].concat(boneKeyFrame, [this.total_frames - 1]);
+
+        // find the left/right keyframes of this.current_frame
+        const [left, right] = binarySearchModified(boneKeyFrame, 0, boneKeyFrame.length - 1, this.current_frame);
+
+        if (method === 'linear') {
+            this.#linearInterpolate(bone_name, left, right);
+        } else {
+            this.#bezierInterpolate(bone_name, left, right);
+        }
     }
+
+    #linearInterpolate(bone_name: string, left: number, right: number) {
+        const leftFrameData = this.getFrameData(left);
+        const rightFrameData = this.getFrameData(right);
+
+        const leftQuaternion = new THREE.Quaternion().fromArray(leftFrameData[bone_name]);
+        const rightQuaternion = new THREE.Quaternion().fromArray(rightFrameData[bone_name]);
+
+
+
+        for (let i = left + 1; i < right; i++) {
+            const t = (i - left) / (right - left);
+
+            const q = new THREE.Quaternion().slerpQuaternions(leftQuaternion, rightQuaternion, t);
+            const euler = new THREE.Euler().setFromQuaternion(q);
+
+            this.data[bone_name][i] = q.toArray() as QuaternionArray;
+        }
+    }
+
+    #bezierInterpolate(bone_name: string, left: number, right: number) { }
 
 
     addKeyFrame(bone_name: string, frame_idx: number) {

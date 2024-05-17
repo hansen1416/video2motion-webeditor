@@ -60,7 +60,7 @@
 	function editRotation(interpolation: ApplyMethod) {
 		const rot = new THREE.Euler(eulerX, eulerY, eulerZ);
 
-		dispatch("edit_bone_rotation", {
+		dispatch("editBoneRotation", {
 			euler: rot,
 			method: interpolation,
 		});

@@ -417,7 +417,7 @@
 		/>
 	</div>
 
-	<Panel on:edit_bone_rotation={editBoneRotation} />
+	<Panel on:editBoneRotation={editBoneRotation} />
 </section>
 
 {#if allDone}
