@@ -118,6 +118,14 @@ export default class AnimationData {
         return frame_data;
     }
 
+    getBoneData(bone_name: string): QuaternionArray[] {
+        return this.data[bone_name];
+    }
+
+    setBoneData(bone_name: string, data: QuaternionArray[]) {
+        this.data[bone_name] = data;
+    }
+
     getBoneKeyFrames(bone_name: string): number[] {
         return this.keyframes[bone_name] ?? [];
     }
@@ -156,29 +164,40 @@ export default class AnimationData {
         const [left, right] = binarySearchModified(boneKeyFrame, 0, boneKeyFrame.length - 1, this.current_frame);
 
         if (method === 'linear') {
-            this.#linearInterpolate(bone_name, left, right);
+            this.#linearInterpolate(bone_name, boneKeyFrame[left], boneKeyFrame[right]);
         } else {
-            this.#bezierInterpolate(bone_name, left, right);
+            this.#bezierInterpolate(bone_name, boneKeyFrame[left], boneKeyFrame[right]);
         }
     }
 
     #linearInterpolate(bone_name: string, left: number, right: number) {
-        const leftFrameData = this.getFrameData(left);
-        const rightFrameData = this.getFrameData(right);
 
-        const leftQuaternion = new THREE.Quaternion().fromArray(leftFrameData[bone_name]);
-        const rightQuaternion = new THREE.Quaternion().fromArray(rightFrameData[bone_name]);
+        const boneAnimationData = this.getBoneData(bone_name);
 
+        const leftQuaternion = new THREE.Quaternion().fromArray(boneAnimationData[left]);
+        const rightQuaternion = new THREE.Quaternion().fromArray(boneAnimationData[right]);
 
+        const middleQuaternion = new THREE.Quaternion().fromArray(boneAnimationData[this.current_frame]);
+        // console.log(leftQuaternion, rightQuaternion, middleQuaternion);
 
-        for (let i = left + 1; i < right; i++) {
-            const t = (i - left) / (right - left);
+        for (let i = left + 1; i < this.current_frame; i++) {
+            const t = (i - left) / (this.current_frame - left);
+            const q = new THREE.Quaternion().slerpQuaternions(leftQuaternion, middleQuaternion, t);
 
-            const q = new THREE.Quaternion().slerpQuaternions(leftQuaternion, rightQuaternion, t);
-            const euler = new THREE.Euler().setFromQuaternion(q);
-
-            this.data[bone_name][i] = q.toArray() as QuaternionArray;
+            boneAnimationData[i] = q.toArray() as QuaternionArray;
         }
+
+
+        for (let i = this.current_frame + 1; i < right; i++) {
+            const t = (i - this.current_frame) / (right - this.current_frame);
+            const q = new THREE.Quaternion().slerpQuaternions(middleQuaternion, rightQuaternion, t);
+
+            boneAnimationData[i] = q.toArray() as QuaternionArray;
+        }
+
+        // console.log(boneAnimationData);
+
+        this.setBoneData(bone_name, boneAnimationData);
     }
 
     #bezierInterpolate(bone_name: string, left: number, right: number) { }
