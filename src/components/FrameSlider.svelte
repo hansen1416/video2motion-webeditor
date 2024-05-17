@@ -21,7 +21,7 @@
 
 	let current_value: number = initial_value;
 
-	let slider: SlierHTMLElement;
+	let slider: HTMLElement;
 
 	let _selectedBone: THREE.Object3D | null = null;
 
@@ -32,7 +32,7 @@
 		noUiSlider.create(slider, {
 			start: [0],
 			tooltips: {
-				to: function (value) {
+				to: function (value: number) {
 					return ~~value;
 				},
 			},
@@ -47,19 +47,22 @@
 			},
 		});
 
-		slider.noUiSlider.on("change.one", function (values: number[]) {
-			current_value = ~~values[0];
-			dispatch("update", { frame_idx: current_value });
-		});
+		(slider as SlierHTMLElement).noUiSlider.on(
+			"change.one",
+			function (values: number[]) {
+				current_value = ~~values[0];
+				dispatch("update", { frame_idx: current_value });
+			},
+		);
 	});
 
 	$: if (
 		min_value !== undefined &&
 		max_value !== undefined &&
 		slider !== undefined &&
-		slider.noUiSlider !== undefined
+		(slider as SlierHTMLElement).noUiSlider !== undefined
 	) {
-		slider.noUiSlider.updateOptions({
+		(slider as SlierHTMLElement).noUiSlider.updateOptions({
 			range: {
 				min: min_value,
 				max: max_value,
@@ -69,7 +72,7 @@
 
 	onDestroy(() => {
 		if (slider) {
-			slider.noUiSlider.destroy();
+			(slider as SlierHTMLElement).noUiSlider.destroy();
 		}
 	});
 
