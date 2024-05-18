@@ -111,13 +111,24 @@
 	</div>
 	<div class="keyframes">
 		{#each keyFrames as value, idx (value)}
-			<div class="keyframe" style="left: {(value / max_value) * 100}%">
+			<div
+				class="keyframe"
+				class:disabled={deleteFrameIdx === value}
+				style="left: {(value / max_value) * 100}%"
+			>
 				<button
 					on:click={() => {
-						deleteFrameIdx = value;
+						if (deleteFrameIdx === value) {
+							deleteFrameIdx = null;
+						} else {
+							deleteFrameIdx = value;
+						}
 					}}
 				>
+					<div class="upper-nob"></div>
+					<div class="lower-nob"></div>
 				</button>
+				<div class="needle"></div>
 			</div>
 		{/each}
 	</div>
@@ -154,7 +165,41 @@
 		position: absolute;
 		top: 0;
 		width: 10px;
-		height: 30px;
+		height: 20px;
+	}
+
+	.keyframe .upper-nob {
+		width: 10px;
+		height: 10px;
 		background-color: #000;
+	}
+
+	.keyframe .lower-nob {
+		width: 0px;
+		height: 0px;
+		border-top: 10px solid #000;
+		border-left: 5px solid transparent;
+		border-right: 5px solid transparent;
+	}
+
+	.keyframe .needle {
+		position: absolute;
+		top: 20px;
+		left: 4px;
+		width: 2px;
+		height: 20px;
+		background-color: #000;
+	}
+
+	.keyframe.disabled .upper-nob {
+		background-color: #ccc;
+	}
+
+	.keyframe.disabled .lower-nob {
+		border-top: 10px solid #ccc;
+	}
+
+	.keyframe.disabled .needle {
+		background-color: #ccc;
 	}
 </style>
