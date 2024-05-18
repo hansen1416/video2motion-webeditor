@@ -4,8 +4,8 @@
 	import * as THREE from "three";
 	import Stats from "three/examples/jsm/libs/stats.module.js";
 
-	import FrameSlider from "./FrameSlider.svelte";
-	import Panel from "./Panel.svelte";
+	import FrameSlider from "../components/FrameSlider.svelte";
+	import Panel from "../components/Panel.svelte";
 	import ThreeScene from "../lib/ThreeScene";
 	import AnimationData from "../lib/AnimationData";
 	import type {

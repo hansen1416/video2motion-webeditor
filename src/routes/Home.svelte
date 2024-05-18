@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onDestroy, onMount } from "svelte";
 
-	import ThreeEditor from "../components/ThreeEditor.svelte";
+	import ThreeEditor from "./ThreeEditor.svelte";
 
 	onMount(() => {});
 

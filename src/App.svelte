@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { Router, Route } from "svelte-routing";
-	import Home from "./routes/Home.svelte";
+	import ThreeEditor from "./routes/ThreeEditor.svelte";
 </script>
 
 <Router>
 	<div>
-		<Route>
-			<Home />
+		<Route path="editor">
+			<ThreeEditor />
 		</Route>
 	</div>
 </Router>
