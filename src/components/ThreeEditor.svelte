@@ -400,6 +400,30 @@
 		// get the keyframe info from AnimationData
 		boneKeyframes = animtionData.getBoneKeyFrames(_selectedBone.name);
 	}
+
+	function exportAnimation() {
+		const data = animtionData.exportData();
+
+		const blob = new Blob([JSON.stringify(data, null, 2)], {
+			type: "application/json",
+		});
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement("a");
+		const filename = "my_animation";
+
+		a.href = url;
+		a.download = `${filename}.json`;
+		a.click();
+
+		URL.revokeObjectURL(url);
+	}
+
+	function saveAnimation() {
+		// save the json data to localstorage
+		const data = animtionData.exportData();
+
+		localStorage.setItem("animation_data", JSON.stringify(data, null, 2));
+	}
 </script>
 
 <section class="three-editor">
@@ -418,6 +442,16 @@
 	</div>
 
 	<Panel on:editBoneRotation={editBoneRotation} />
+
+	<div class="actions">
+		<button on:click={exportAnimation}>
+			<span>Export</span>
+		</button>
+
+		<button on:click={saveAnimation}>
+			<span>Save</span>
+		</button>
+	</div>
 </section>
 
 {#if allDone}
@@ -444,5 +478,16 @@
 		position: absolute;
 		bottom: -1;
 		left: 0;
+	}
+
+	.actions {
+		position: absolute;
+		top: 16px;
+		right: 16px;
+	}
+
+	.actions button {
+		font-size: 16px;
+		margin-left: 16px;
 	}
 </style>

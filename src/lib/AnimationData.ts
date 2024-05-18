@@ -153,9 +153,6 @@ export default class AnimationData {
         // then apply the rotation to the bone
         this.applyRotation(this.current_frame);
 
-        // todo, apply rotation to other frames between two keyframes
-        // if current frame is a keyframe, it should effect two keyframes interval adjacent to it
-
         let boneKeyFrame = this.getBoneKeyFrames(bone_name);
 
         boneKeyFrame = [0].concat(boneKeyFrame, [this.total_frames - 1]);
@@ -163,6 +160,8 @@ export default class AnimationData {
         // find the left/right keyframes of this.current_frame
         const [left, right] = binarySearchModified(boneKeyFrame, 0, boneKeyFrame.length - 1, this.current_frame);
 
+        // apply rotation to other frames between two keyframes
+        // if current frame is a keyframe, it should effect two keyframes interval adjacent to it
         if (method === 'linear') {
             this.#linearInterpolate(bone_name, boneKeyFrame[left], boneKeyFrame[right]);
         } else {
@@ -226,15 +225,11 @@ export default class AnimationData {
         }
     }
 
-    #getAdjacentKeyFrames(bone_name: string, frame_idx: number) {
-        const keyframes = this.getBoneKeyFrames(bone_name);
-        const idx = keyframes.indexOf(frame_idx);
-        if (idx === -1) {
-            return [];
-        }
-
-        return [keyframes[idx - 1], keyframes[idx + 1]];
+    exportData() {
+        return {
+            data: this.data,
+            keyframes: this.keyframes
+        };
     }
-
 
 }
