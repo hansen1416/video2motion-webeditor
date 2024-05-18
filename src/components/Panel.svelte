@@ -99,25 +99,27 @@
 		<Icon name="rotate" size={iconSize} />
 	</button>
 	{#if showEulerInputs}
-		<label>
-			<span>x:</span>
-			<input bind:value={eulerX} />
-		</label>
-		<label>
-			<span>y:</span>
-			<input bind:value={eulerY} />
-		</label>
-		<label>
-			<span>z:</span>
-			<input bind:value={eulerZ} />
-		</label>
-		<button
-			on:click={() => {
-				editRotation("linear");
-			}}
-		>
-			<span>apply linear</span>
-		</button>
+		<div class="euler-inputs">
+			<label>
+				<span>x:</span>
+				<input bind:value={eulerX} />
+			</label>
+			<label>
+				<span>y:</span>
+				<input bind:value={eulerY} />
+			</label>
+			<label>
+				<span>z:</span>
+				<input bind:value={eulerZ} />
+			</label>
+			<button
+				on:click={() => {
+					editRotation("linear");
+				}}
+			>
+				<span>Apply</span>
+			</button>
+		</div>
 	{/if}
 </section>
 
@@ -131,15 +133,30 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: flex-start;
-		align-items: center;
+		align-items: flex-end;
 	}
 
 	.panel button {
 		margin-bottom: 8px;
 	}
 
+	.euler-inputs {
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		align-items: center;
+		padding-top: 12px;
+		color: #fff;
+	}
+
+	.euler-inputs button {
+		color: #fff;
+		font-size: 18px;
+		padding-top: 8px;
+	}
+
 	.panel input {
-		width: 60%;
+		width: 60px;
 		border: 0;
 	}
 </style>
