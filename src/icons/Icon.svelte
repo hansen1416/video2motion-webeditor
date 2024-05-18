@@ -4,6 +4,8 @@
 
 	export let name: string;
 
+	export let size: number = 30;
+
 	let IconComponent: ConstructorOfATypedSvelteComponent;
 
 	onMount(async () => {
@@ -13,7 +15,7 @@
 </script>
 
 <div class="icon">
-	<svelte:component this={IconComponent} size="30" color="#fff" />
+	<svelte:component this={IconComponent} {size} color="#fff" />
 </div>
 
 <style>

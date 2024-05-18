@@ -12,6 +12,8 @@
 	} from "../store";
 	import WebStorage from "../lib/WebStorage";
 
+	const iconSize: number = 36;
+
 	let eulerX: number = 0;
 	let eulerY: number = 0;
 	let eulerZ: number = 0;
@@ -73,28 +75,28 @@
 			swicthDisplayScene("skeleton");
 		}}
 	>
-		<Icon name="bones" />
+		<Icon name="bones" size={iconSize} />
 	</button>
 	<button
 		on:click={() => {
 			swicthDisplayScene("mesh");
 		}}
 	>
-		<Icon name="mesh" />
+		<Icon name="mesh" size={iconSize} />
 	</button>
 	<button
 		on:click={() => {
 			swicthControlType("translation");
 		}}
 	>
-		<Icon name="axis" />
+		<Icon name="axis" size={iconSize} />
 	</button>
 	<button
 		on:click={() => {
 			swicthControlType("rotation");
 		}}
 	>
-		<Icon name="rotate" />
+		<Icon name="rotate" size={iconSize} />
 	</button>
 	{#if showEulerInputs}
 		<label>
@@ -124,14 +126,16 @@
 		position: absolute;
 		top: 25vh;
 		right: 30px;
-		width: 60px;
-		height: 50vh;
-		background-color: rgba(200, 200, 200, 0.5);
-		padding-top: 12px;
+		width: auto;
+		height: auto;
 		display: flex;
 		flex-direction: column;
 		justify-content: flex-start;
 		align-items: center;
+	}
+
+	.panel button {
+		margin-bottom: 8px;
 	}
 
 	.panel input {
