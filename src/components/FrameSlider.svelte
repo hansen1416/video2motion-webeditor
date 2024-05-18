@@ -48,7 +48,7 @@
 		});
 
 		(slider as SlierHTMLElement).noUiSlider.on(
-			"change.one",
+			"update.one",
 			function (values: number[]) {
 				current_value = ~~values[0];
 				dispatch("update", { frame_idx: current_value });
