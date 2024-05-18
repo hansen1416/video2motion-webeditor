@@ -106,19 +106,21 @@
 			</button>
 		</div>
 	</div>
-	<div bind:this={slider}></div>
-	{#each keyFrames as value, idx (value)}
-		<button
-			on:click={() => {
-				deleteFrameIdx = value;
-			}}
-		>
-			<div
-				class="keyframe"
-				style="left: {(value / max_value) * 100}%"
-			></div>
-		</button>
-	{/each}
+	<div class="slide-box">
+		<div bind:this={slider}></div>
+	</div>
+	<div class="keyframes">
+		{#each keyFrames as value, idx (value)}
+			<div class="keyframe" style="left: {(value / max_value) * 100}%">
+				<button
+					on:click={() => {
+						deleteFrameIdx = value;
+					}}
+				>
+				</button>
+			</div>
+		{/each}
+	</div>
 </div>
 
 <style>
@@ -127,14 +129,30 @@
 	}
 
 	.keyframe-panel {
+		position: relative;
 		display: flex;
 		justify-content: flex-end;
 		align-items: center;
+		width: 100%;
+		height: 20px;
+	}
+
+	.slide-box {
+		position: absolute;
+		top: 40px;
+		width: 100%;
+	}
+
+	.keyframes {
+		position: relative;
+		width: 100%;
+		height: 12px;
+		margin-bottom: 8px;
 	}
 
 	.keyframe {
 		position: absolute;
-		top: 20px;
+		top: 0;
 		width: 10px;
 		height: 30px;
 		background-color: #000;
