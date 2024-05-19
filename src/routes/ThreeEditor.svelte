@@ -97,6 +97,10 @@
 
 	let allDone: boolean = false;
 
+	let displaySceneUnscribe: Function;
+	let controlTypeUnscribe: Function;
+	let selectedBoneUnscribe: Function;
+
 	function animate() {
 		if (threeScene) {
 			raycaster.setFromCamera(mouse, threeScene.camera);
@@ -183,7 +187,7 @@
 			animate();
 
 			// this subscribe must happen after the scene is loaded
-			displayScene.subscribe((value) => {
+			displaySceneUnscribe = displayScene.subscribe((value) => {
 				if (value === "skeleton") {
 					skeleton.show();
 
@@ -200,7 +204,11 @@
 	});
 
 	onDestroy(() => {
-		// unsubscribe all stores
+		// unscribe all the store
+		displaySceneUnscribe();
+		controlTypeUnscribe();
+		selectedBoneUnscribe();
+
 		cancelAnimationFrame(animation_pointer);
 
 		threeScene.dispose();
@@ -290,39 +298,41 @@
 		skeleton.highlightBone(-1);
 	}
 
-	selectedBone.subscribe((value: THREE.Object3D | null) => {
-		_selectedBone = value;
+	controlTypeUnscribe = selectedBone.subscribe(
+		(value: THREE.Object3D | null) => {
+			_selectedBone = value;
 
-		if (value) {
-			// get the current bone rotation, will be displayed in the control panel
-			currentRotation.set(value.rotation.clone());
+			if (value) {
+				// get the current bone rotation, will be displayed in the control panel
+				currentRotation.set(value.rotation.clone());
 
-			rotationControl.setBone(value as THREE.Bone);
-			translationControl.setBone(value as THREE.Bone);
+				rotationControl.setBone(value as THREE.Bone);
+				translationControl.setBone(value as THREE.Bone);
 
-			if (_controlType === "rotation") {
-				translationControl.hide();
-				rotationControl.update();
-				rotationControl.show();
-			} else if (_controlType === "translation") {
-				rotationControl.hide();
-				translationControl.update();
-				translationControl.show();
-			} else if (_controlType === "") {
-				controlType.set("rotation");
+				if (_controlType === "rotation") {
+					translationControl.hide();
+					rotationControl.update();
+					rotationControl.show();
+				} else if (_controlType === "translation") {
+					rotationControl.hide();
+					translationControl.update();
+					translationControl.show();
+				} else if (_controlType === "") {
+					controlType.set("rotation");
+				}
+			} else {
+				// de-select bone, and set  currentBoneRotation to empty
+				currentRotation.set(null);
+
+				rotationControl.setBone(null);
+				translationControl.setBone(null);
+
+				controlType.set("");
 			}
-		} else {
-			// de-select bone, and set  currentBoneRotation to empty
-			currentRotation.set(null);
+		},
+	);
 
-			rotationControl.setBone(null);
-			translationControl.setBone(null);
-
-			controlType.set("");
-		}
-	});
-
-	controlType.subscribe((value: ControlType) => {
+	controlTypeUnscribe = controlType.subscribe((value: ControlType) => {
 		// swicth between rotation and translation
 		// this will not affect visibility of the control, which controled by selectedBone
 		_controlType = value;

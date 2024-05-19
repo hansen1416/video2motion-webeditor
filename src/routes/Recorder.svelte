@@ -1,11 +1,78 @@
 <script lang="ts">
 	import { onDestroy, onMount } from "svelte";
+	import * as THREE from "three";
+	import Stats from "three/examples/jsm/libs/stats.module.js";
 
-	onMount(() => {});
-
-	onDestroy(() => {});
+	import ThreeScene from "../lib/ThreeScene";
+	import { loadGLTF } from "../utils/ropes";
 
 	let video: HTMLVideoElement;
+
+	let canvas: HTMLCanvasElement;
+
+	let stats: Stats;
+
+	let animation_pointer = 0;
+
+	let threeScene: ThreeScene;
+
+	let diva: THREE.Object3D;
+
+	let bones: { [key: string]: THREE.Bone } = {};
+
+	function animate() {
+		if (threeScene) {
+			// update physics world and threejs renderer
+			threeScene.onFrameUpdate(stats);
+		}
+		animation_pointer = requestAnimationFrame(animate);
+	}
+
+	onMount(() => {
+		threeScene = new ThreeScene(
+			canvas,
+			document.documentElement.clientWidth / 2,
+			document.documentElement.clientHeight,
+		);
+
+		Promise.all([loadGLTF(`/glb/dors.glb`)]).then(([gltf]) => {
+			diva = gltf.scene.children[0];
+
+			diva.name = "diva";
+
+			diva.position.set(0, -1, 0);
+
+			threeScene.scene.add(diva);
+
+			diva.traverse((node: THREE.Object3D) => {
+				// @ts-ignore
+				if (node.isMesh) {
+					node.castShadow = true;
+
+					const mat = (node as THREE.SkinnedMesh)
+						.material as THREE.MeshStandardMaterial;
+
+					mat.transparent = true;
+				}
+				// @ts-ignore
+				if (node.isBone) {
+					// @ts-ignore
+					if (bones[node.name] === undefined) {
+						// somehow maximo has double bones, so only use the first one
+						bones[node.name] = node as THREE.Bone;
+					}
+				}
+			});
+
+			animate();
+		});
+	});
+
+	onDestroy(() => {
+		cancelAnimationFrame(animation_pointer);
+
+		threeScene.dispose();
+	});
 
 	function uploadVideo(e: Event) {
 		console.log(e.target);
@@ -36,19 +103,18 @@
 			</video>
 		</div>
 	</div>
-	<div class="right-hand"></div>
+	<div class="right-hand">
+		<canvas bind:this={canvas} />
+	</div>
 </section>
 
 <style>
-	section {
-		display: flex;
-		flex-direction: row;
-	}
-
 	.left-hand,
 	.right-hand {
-		flex-grow: 1;
-		flex-basis: 50%;
+		position: absolute;
+		width: 50vw;
+		height: 100vh;
+		top: 0;
 	}
 
 	.left-hand {
@@ -56,6 +122,11 @@
 		flex-direction: column;
 		justify-content: flex-start;
 		align-items: center;
+		left: 0;
+	}
+
+	.right-hand {
+		right: 0;
 	}
 
 	.input-box {
