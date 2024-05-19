@@ -20,6 +20,8 @@
 
 	let bones: { [key: string]: THREE.Bone } = {};
 
+	let videoReady = false;
+
 	function animate() {
 		if (threeScene) {
 			// update physics world and threejs renderer
@@ -75,8 +77,6 @@
 	});
 
 	function uploadVideo(e: Event) {
-		console.log(e.target);
-
 		const inputs = e.target as HTMLInputElement;
 
 		if (!inputs.files) {
@@ -87,6 +87,8 @@
 		const reader = new FileReader();
 		reader.onload = (e: ProgressEvent) => {
 			video.src = (e.target as FileReader).result as string;
+
+			videoReady = true;
 		};
 		reader.readAsDataURL(file);
 	}
@@ -101,6 +103,9 @@
 			<video controls={true} bind:this={video}>
 				<track kind="captions" srclang="en" label="English" default />
 			</video>
+		</div>
+		<div class="extract">
+			<button disabled={!videoReady}>Extract</button>
 		</div>
 	</div>
 	<div class="right-hand">
@@ -141,5 +146,23 @@
 	video {
 		max-width: 100%;
 		max-height: 100%;
+	}
+
+	.extract {
+		position: absolute;
+		top: 50%;
+		right: -48px;
+		width: 96px;
+		height: 32px;
+		font-size: 18px;
+		background-color: #fff;
+		text-align: center;
+		line-height: 30px;
+		z-index: 2;
+	}
+
+	.extract button {
+		width: 100%;
+		height: 100%;
 	}
 </style>
