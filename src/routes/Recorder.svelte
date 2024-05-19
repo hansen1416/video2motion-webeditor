@@ -2,6 +2,7 @@
 	import { onDestroy, onMount } from "svelte";
 	import * as THREE from "three";
 	import Stats from "three/examples/jsm/libs/stats.module.js";
+	import { PoseLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
 
 	import ThreeScene from "../lib/ThreeScene";
 	import { loadGLTF } from "../utils/ropes";
@@ -22,11 +23,30 @@
 
 	let videoReady = false;
 
+	let poseLandmarker: PoseLandmarker;
+
+	let startExtract = false;
+	let videoDuration = 0;
+
 	function animate() {
 		if (threeScene) {
 			// update physics world and threejs renderer
 			threeScene.onFrameUpdate(stats);
+
+			if (
+				videoReady &&
+				startExtract &&
+				poseLandmarker &&
+				video.currentTime <= videoDuration
+			) {
+				video.currentTime += 1 / 60;
+
+				poseLandmarker.detect(video, (result: Object) => {
+					console.log(result);
+				});
+			}
 		}
+
 		animation_pointer = requestAnimationFrame(animate);
 	}
 
@@ -37,7 +57,10 @@
 			document.documentElement.clientHeight,
 		);
 
-		Promise.all([loadGLTF(`/glb/dors.glb`)]).then(([gltf]) => {
+		Promise.all([
+			loadGLTF(`/glb/dors.glb`),
+			FilesetResolver.forVisionTasks(`/task-vision/`),
+		]).then(([gltf, vision]) => {
 			diva = gltf.scene.children[0];
 
 			diva.name = "diva";
@@ -66,6 +89,17 @@
 				}
 			});
 
+			PoseLandmarker.createFromOptions(vision, {
+				baseOptions: {
+					modelAssetPath: `/task-vision/pose_landmarker_lite.task`,
+					delegate: "GPU",
+				},
+				runningMode: "IMAGE",
+				numPoses: 1,
+			}).then((landmarker) => {
+				poseLandmarker = landmarker;
+			});
+
 			animate();
 		});
 	});
@@ -87,9 +121,16 @@
 		const reader = new FileReader();
 		reader.onload = (e: ProgressEvent) => {
 			video.src = (e.target as FileReader).result as string;
-
-			videoReady = true;
 		};
+
+		video.onloadedmetadata = () => {
+			videoDuration = video.duration;
+
+			if (poseLandmarker) {
+				videoReady = true;
+			}
+		};
+
 		reader.readAsDataURL(file);
 	}
 </script>
@@ -100,12 +141,17 @@
 			<input type="file" accept="video/*" on:change={uploadVideo} />
 		</div>
 		<div class="video-box">
-			<video controls={true} bind:this={video}>
+			<video controls={false} bind:this={video}>
 				<track kind="captions" srclang="en" label="English" default />
 			</video>
 		</div>
 		<div class="extract">
-			<button disabled={!videoReady}>Extract</button>
+			<button
+				class:disabled={!videoReady || startExtract}
+				on:click={() => {
+					startExtract = !startExtract;
+				}}>Extract</button
+			>
 		</div>
 	</div>
 	<div class="right-hand">
@@ -164,5 +210,9 @@
 	.extract button {
 		width: 100%;
 		height: 100%;
+	}
+
+	.extract button.disabled {
+		opacity: 0.5;
 	}
 </style>
