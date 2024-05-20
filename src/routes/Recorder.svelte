@@ -39,11 +39,13 @@
 				poseLandmarker &&
 				video.currentTime <= videoDuration
 			) {
-				video.currentTime += 1 / 60;
-
-				poseLandmarker.detect(video, (result: Object) => {
-					console.log(result);
-				});
+				poseLandmarker.detectForVideo(
+					video,
+					video.currentTime * 1000,
+					(result: Object) => {
+						console.log(result);
+					},
+				);
 			}
 		}
 
@@ -94,7 +96,7 @@
 					modelAssetPath: `/task-vision/pose_landmarker_lite.task`,
 					delegate: "GPU",
 				},
-				runningMode: "IMAGE",
+				runningMode: "VIDEO",
 				numPoses: 1,
 			}).then((landmarker) => {
 				poseLandmarker = landmarker;
@@ -125,7 +127,9 @@
 
 		video.onloadedmetadata = () => {
 			videoDuration = video.duration;
+		};
 
+		video.onloadeddata = () => {
 			if (poseLandmarker) {
 				videoReady = true;
 			}
@@ -147,9 +151,15 @@
 		</div>
 		<div class="extract">
 			<button
-				class:disabled={!videoReady || startExtract}
+				disabled={!videoReady || !video}
+				class:disabled={startExtract}
 				on:click={() => {
 					startExtract = !startExtract;
+
+					if (video) {
+						video.currentTime = 0;
+						video.play();
+					}
 				}}>Extract</button
 			>
 		</div>
