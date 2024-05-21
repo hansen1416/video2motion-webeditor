@@ -98,7 +98,7 @@
 				},
 				runningMode: "VIDEO",
 				numPoses: 1,
-			}).then((landmarker) => {
+			}).then((landmarker: PoseLandmarker) => {
 				poseLandmarker = landmarker;
 			});
 
