@@ -5,10 +5,11 @@
 	import { PoseLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
 	import type { PoseLandmarkerResult } from "@mediapipe/tasks-vision";
 
+	import type { WorldPoseLandmarks } from "../types";
 	import ThreeScene from "../lib/ThreeScene";
 	import JointsPosition2Rotation from "../lib/JointsPosition2Rotation";
 	import AnimationData from "../lib/AnimationData";
-	import { loadGLTF } from "../utils/ropes";
+	import { loadGLTF, rotateBones } from "../utils/ropes";
 
 	let video: HTMLVideoElement;
 
@@ -25,15 +26,16 @@
 	let bones: { [key: string]: THREE.Bone } = {};
 
 	let videoReady = false;
-
+	// mediapipe pose landmarker detector
 	let poseLandmarker: PoseLandmarker;
+	// convert pose landmarks to bone rotations
+	let jointsPos2Rot = new JointsPosition2Rotation();
+	// animation data in format of {boneName: quaternion[]}
+	let animationData = new AnimationData();
 
 	let startExtract = false;
 	let videoDuration = 0;
-
-	let jointsPos2Rot = new JointsPosition2Rotation();
-
-	let animationData = new AnimationData();
+	let extractDone = false;
 
 	function animate() {
 		if (threeScene) {
@@ -50,20 +52,20 @@
 					video,
 					video.currentTime * 1000,
 					(result: PoseLandmarkerResult) => {
-						console.log(result.worldLandmarks);
+						const worldLandmarks: WorldPoseLandmarks =
+							result.worldLandmarks[0];
 
-						jointsPos2Rot.applyPose2Bone(
-							result.worldLandmarks as any,
-						);
-
+						// calculate the rotation of each bone based on the landmarks
+						jointsPos2Rot.applyPose2Bone(worldLandmarks);
+						// apply the rotation to the bones of the model
+						rotateBones(jointsPos2Rot.getRotationsArray(), bones);
+						// save the rotation data of the frame for the animation
 						animationData.appendData(
 							jointsPos2Rot.getRotationsArray(),
 						);
 					},
 				);
 			}
-
-			// todo when video finished, show save animation button
 		}
 
 		animation_pointer = requestAnimationFrame(animate);
@@ -154,6 +156,13 @@
 			}
 		};
 
+		video.onended = () => {
+			// disable pose detection
+			startExtract = false;
+			// when video finished, show save animation button
+			extractDone = true;
+		};
+
 		reader.readAsDataURL(file);
 	}
 </script>
@@ -182,6 +191,38 @@
 				}}>Extract</button
 			>
 		</div>
+		{#if extractDone}
+			<div class="done-btns">
+				<button
+					on:click={() => {
+						const data = animationData.exportData();
+
+						localStorage.setItem(
+							"animation_data",
+							JSON.stringify(data, null, 2),
+						);
+					}}>Save to mine</button
+				>
+				<button
+					on:click={() => {
+						const data = animationData.exportData();
+
+						const blob = new Blob([JSON.stringify(data, null, 2)], {
+							type: "application/json",
+						});
+						const url = URL.createObjectURL(blob);
+						const a = document.createElement("a");
+						const filename = "my_animation";
+
+						a.href = url;
+						a.download = `${filename}.json`;
+						a.click();
+
+						URL.revokeObjectURL(url);
+					}}>Download</button
+				>
+			</div>
+		{/if}
 	</div>
 	<div class="right-hand">
 		<canvas bind:this={canvas} />
@@ -230,7 +271,6 @@
 		width: 96px;
 		height: 32px;
 		font-size: 18px;
-		background-color: #fff;
 		text-align: center;
 		line-height: 30px;
 		z-index: 2;
@@ -239,9 +279,28 @@
 	.extract button {
 		width: 100%;
 		height: 100%;
+		background-color: #fff;
 	}
 
 	.extract button.disabled {
 		opacity: 0.5;
+	}
+
+	.done-btns {
+		position: absolute;
+		top: calc(50% + 60px);
+		right: -48px;
+		width: 96px;
+		height: auto;
+		font-size: 18px;
+		text-align: center;
+		z-index: 2;
+	}
+
+	.done-btns button {
+		width: 100%;
+		height: 32px;
+		margin-bottom: 12px;
+		background-color: #fff;
 	}
 </style>

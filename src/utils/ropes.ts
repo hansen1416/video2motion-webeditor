@@ -8,6 +8,8 @@ import { type GLTF } from "@types/three/examples/jsm/loaders/GLTFLoader.d.ts"
 import { type BVH } from "@types/three/examples/jsm/loaders/BVHLoader.d.ts"
 import * as THREE from "three";
 
+import type { QuaternionArray } from "../types";
+
 export function loadBVH(url: string): Promise<BVH> {
     return new Promise((resolve) => {
         const loader = new BVHLoader();
@@ -125,4 +127,22 @@ export function insertIntoSortedArray(arr: number[], num: number) {
     const insertionIndex = binarySearch(arr, num);
     arr.splice(insertionIndex, 0, num);
     return arr;
+}
+
+/**
+ * apply joints rotations to the bones of a model
+ * @param boneRotations 
+ * @param modelBones 
+ */
+export function rotateBones(
+    boneRotations: { [key: string]: QuaternionArray },
+    modelBones: { [key: string]: THREE.Bone },
+) {
+    for (const [boneName, rotation] of Object.entries(boneRotations)) {
+        const bone = modelBones[boneName];
+
+        if (bone) {
+            bone.quaternion.fromArray(rotation);
+        }
+    }
 }

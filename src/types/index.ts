@@ -19,3 +19,5 @@ export type DiaplayScene = "mesh" | "skeleton";
 export type ControlType = "rotation" | "translation" | "";
 
 export type ApplyMethod = "linear" | "slerp";
+
+export type WorldPoseLandmarks = { x: number, y: number, z: number, visibility: number }[];
