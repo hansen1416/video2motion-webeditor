@@ -96,7 +96,21 @@ export default class AnimationData {
 
     }
 
-    loadData(data: AnimationDataObject, bones: { [key: string]: THREE.Bone }) {
+    initalize(bone_names: string[]): void {
+        bone_names.forEach((name) => {
+            this.data[name] = [];
+        });
+    }
+
+    appendData(frameData: AnimationFrameDataObject): void {
+        for (let key in frameData) {
+            this.data[key].push(frameData[key]);
+        }
+
+        this.total_frames = this.data[Object.keys(this.data)[0]].length - 1;
+    }
+
+    loadData(data: AnimationDataObject, bones: { [key: string]: THREE.Bone }): void {
 
         this.bones = bones;
 

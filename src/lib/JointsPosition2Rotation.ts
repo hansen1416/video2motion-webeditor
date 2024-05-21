@@ -1,48 +1,45 @@
 import * as THREE from 'three';
+import type { QuaternionArray } from '../types/index';
 
 export default class JointsPosition2Rotation {
 
 
     constructor() { }
 
-    // joints_map = {
-    //     "PELVIS": 0,
-    //     "LEFT_HIP": 1,
-    //     "LEFT_KNEE": 2,
-    //     "LEFT_ANKLE": 3,
-    //     "RIGHT_HIP": 4,
-    //     "RIGHT_KNEE": 5,
-    //     "RIGHT_ANKLE": 6,
-    //     "SPINE": 7,
-    //     "NECK": 8,
-    //     "nose": 9,
-    //     "top": 10,
-    //     "RIGHT_SHOULDER": 11,
-    //     "RIGHT_ELBOW": 12,
-    //     "RIGHT_WRIST": 13,
-    //     "LEFT_SHOULDER": 14,
-    //     "LEFT_ELBOW": 15,
-    //     "LEFT_WRIST": 16,
-    // };
-
     joints_map: { [key: string]: number } = {
-        "PELVIS": 0,
-        "RIGHT_HIP": 1,
-        "RIGHT_KNEE": 2,
-        "RIGHT_ANKLE": 3,
-        "LEFT_HIP": 4,
-        "LEFT_KNEE": 5,
-        "LEFT_ANKLE": 6,
-        "SPINE": 7,
-        "NECK": 8,
-        "nose": 9,
-        "top": 10,
+        "NOSE": 0,
+        "LEFT_EYE_INNER": 1,
+        "LEFT_EYE": 2,
+        "LEFT_EYE_OUTER": 3,
+        "RIGHT_EYE_INNER": 4,
+        "RIGHT_EYE": 5,
+        "RIGHT_EYE_OUTER": 6,
+        "LEFT_EAR": 7,
+        "RIGHT_EAR": 8,
+        "MOUTH_LEFT": 9,
+        "MOUTH_RIGHT": 10,
         "LEFT_SHOULDER": 11,
-        "LEFT_ELBOW": 12,
-        "LEFT_WRIST": 13,
-        "RIGHT_SHOULDER": 14,
-        "RIGHT_ELBOW": 15,
+        "RIGHT_SHOULDER": 12,
+        "LEFT_ELBOW": 13,
+        "RIGHT_ELBOW": 14,
+        "LEFT_WRIST": 15,
         "RIGHT_WRIST": 16,
+        "LEFT_PINKY": 17,
+        "RIGHT_PINKY": 18,
+        "LEFT_INDEX": 19,
+        "RIGHT_INDEX": 20,
+        "LEFT_THUMB": 21,
+        "RIGHT_THUMB": 22,
+        "LEFT_HIP": 23,
+        "RIGHT_HIP": 24,
+        "LEFT_KNEE": 25,
+        "RIGHT_KNEE": 26,
+        "LEFT_ANKLE": 27,
+        "RIGHT_ANKLE": 28,
+        "LEFT_HEEL": 29,
+        "RIGHT_HEEL": 30,
+        "LEFT_FOOT_INDEX": 31,
+        "RIGHT_FOOT_INDEX": 32,
     };
 
 
@@ -101,15 +98,30 @@ export default class JointsPosition2Rotation {
         "RightLeg": ["Hips", "RightUpLeg"],
     }
 
+    getModelBoneNames(): string[] {
+        return Object.keys(this.rotations);
+    }
+
+    getRotationsArray(): { [key: string]: QuaternionArray } {
+        const rotations: { [key: string]: QuaternionArray } = {};
+        for (const key in this.rotations) {
+            rotations[key] = this.rotations[key].toArray() as QuaternionArray;
+        }
+        return rotations;
+    }
+
 
     #pelvisRotation() {
 
-
+        const left_shoulder = this.pose3d[this.joints_map["LEFT_SHOULDER"]];
+        const right_shoulder = this.pose3d[this.joints_map["RIGHT_SHOULDER"]];
         const left_hip = this.pose3d[this.joints_map["LEFT_HIP"]];
         const right_hip = this.pose3d[this.joints_map["RIGHT_HIP"]];
-        const neck = this.pose3d[this.joints_map["NECK"]];
-        const pelvis = this.pose3d[this.joints_map["PELVIS"]];
 
+        // let neck be the middle point of left and right shoulder
+        const neck = new THREE.Vector3().addVectors(left_shoulder, right_shoulder).multiplyScalar(0.5);
+        // let pelvis be the middle point of left and right hip
+        const pelvis = new THREE.Vector3().addVectors(left_hip, right_hip).multiplyScalar(0.5);
 
         const xaxis = new THREE.Vector3()
             .subVectors(left_hip, right_hip)
@@ -150,8 +162,13 @@ export default class JointsPosition2Rotation {
     #spine2rotation() {
         const left_shoulder = this.pose3d[this.joints_map["LEFT_SHOULDER"]];
         const right_shoulder = this.pose3d[this.joints_map["RIGHT_SHOULDER"]];
-        const neck = this.pose3d[this.joints_map["NECK"]];
-        const spine = this.pose3d[this.joints_map["SPINE"]];
+        const left_hip = this.pose3d[this.joints_map["LEFT_HIP"]];
+        const right_hip = this.pose3d[this.joints_map["RIGHT_HIP"]];
+
+        // let neck be the middle point of left and right shoulder
+        const neck = new THREE.Vector3().addVectors(left_shoulder, right_shoulder).multiplyScalar(0.5);
+        // let spine be the middle point of left and right hip
+        const spine = new THREE.Vector3().addVectors(left_hip, right_hip).multiplyScalar(0.5);
 
         const xaxis = new THREE.Vector3()
             .subVectors(left_shoulder, right_shoulder)

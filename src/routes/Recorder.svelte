@@ -3,8 +3,11 @@
 	import * as THREE from "three";
 	import Stats from "three/examples/jsm/libs/stats.module.js";
 	import { PoseLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
+	import type { PoseLandmarkerResult } from "@mediapipe/tasks-vision";
 
 	import ThreeScene from "../lib/ThreeScene";
+	import JointsPosition2Rotation from "../lib/JointsPosition2Rotation";
+	import AnimationData from "../lib/AnimationData";
 	import { loadGLTF } from "../utils/ropes";
 
 	let video: HTMLVideoElement;
@@ -28,6 +31,10 @@
 	let startExtract = false;
 	let videoDuration = 0;
 
+	let jointsPos2Rot = new JointsPosition2Rotation();
+
+	let animationData = new AnimationData();
+
 	function animate() {
 		if (threeScene) {
 			// update physics world and threejs renderer
@@ -42,11 +49,21 @@
 				poseLandmarker.detectForVideo(
 					video,
 					video.currentTime * 1000,
-					(result: Object) => {
-						console.log(result);
+					(result: PoseLandmarkerResult) => {
+						console.log(result.worldLandmarks);
+
+						jointsPos2Rot.applyPose2Bone(
+							result.worldLandmarks as any,
+						);
+
+						animationData.appendData(
+							jointsPos2Rot.getRotationsArray(),
+						);
 					},
 				);
 			}
+
+			// todo when video finished, show save animation button
 		}
 
 		animation_pointer = requestAnimationFrame(animate);
@@ -58,6 +75,8 @@
 			document.documentElement.clientWidth / 2,
 			document.documentElement.clientHeight,
 		);
+
+		animationData.initalize(jointsPos2Rot.getModelBoneNames());
 
 		Promise.all([
 			loadGLTF(`/glb/dors.glb`),
