@@ -215,6 +215,10 @@ export default class AnimationData {
 
     #bezierInterpolate(bone_name: string, left: number, right: number): void { }
 
+    loadKeyFrames(keyframes: { [key: string]: number[] }): void {
+        this.keyframes = keyframes;
+    }
+
 
     addKeyFrame(bone_name: string, frame_idx: number): void {
         let boneKeyFrame = this.getBoneKeyFrames(bone_name);

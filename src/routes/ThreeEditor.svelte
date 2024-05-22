@@ -129,9 +129,7 @@
 
 		Promise.all([
 			loadGLTF(`/glb/dors.glb`),
-			loadJSON(
-				`/anim-calculated-quaternion/180 Turn W_ Briefcase (1)-30-0.json`,
-			),
+			loadJSON(`/anim-calculated-quaternion/my_animation.json`),
 		]).then(([gltf, anim_data]) => {
 			diva = gltf.scene.children[0];
 
@@ -167,7 +165,14 @@
 			threeScene.scene.add(translationControl.group);
 
 			// initial animation data begin
-			animtionData.loadData(anim_data as AnimationDataObject, bones);
+			animtionData.loadData(
+				(anim_data as any).data as AnimationDataObject,
+				bones,
+			);
+
+			animtionData.loadKeyFrames(
+				(anim_data as any).keyframes as { [key: string]: number[] },
+			);
 
 			total_frames = animtionData.total_frames;
 
