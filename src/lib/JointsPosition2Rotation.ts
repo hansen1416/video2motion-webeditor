@@ -243,7 +243,7 @@ export default class JointsPosition2Rotation {
     }
 
     /**
-     * Apply pose to bone
+     * calculate the rotation of each bone based on the 3D pose
      * @param pose3D 3D pose
      * @returns {void}
      */
