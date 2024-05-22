@@ -232,7 +232,7 @@
 	.left-hand {
 		display: flex;
 		flex-direction: column;
-		justify-content: flex-start;
+		justify-content: center;
 		align-items: center;
 		left: 0;
 	}
@@ -243,6 +243,8 @@
 
 	.input-box {
 		margin: 10px 0;
+		position: absolute;
+		top: 0;
 	}
 
 	.video-box {
