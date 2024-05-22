@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { QuaternionArray } from '../types/index';
+import type { QuaternionArray, Vector3Array } from '../types/index';
 
 export default class JointsPosition2Rotation {
 
@@ -111,7 +111,7 @@ export default class JointsPosition2Rotation {
     }
 
 
-    #pelvisRotation() {
+    #pelvisRotation(): THREE.Quaternion {
 
         const left_shoulder = this.pose3d[this.joints_map["LEFT_SHOULDER"]];
         const right_shoulder = this.pose3d[this.joints_map["RIGHT_SHOULDER"]];
@@ -159,7 +159,7 @@ export default class JointsPosition2Rotation {
         return new THREE.Quaternion().setFromRotationMatrix(m);
     }
 
-    #spine2rotation() {
+    #spine2rotation(): THREE.Quaternion {
         const left_shoulder = this.pose3d[this.joints_map["LEFT_SHOULDER"]];
         const right_shoulder = this.pose3d[this.joints_map["RIGHT_SHOULDER"]];
         const left_hip = this.pose3d[this.joints_map["LEFT_HIP"]];
@@ -210,7 +210,7 @@ export default class JointsPosition2Rotation {
         );
     }
 
-    #get_joint_world_vector(start_joint_name: string, end_joint_name: string) {
+    #get_joint_world_vector(start_joint_name: string, end_joint_name: string): THREE.Vector3 {
         const start_joint =
             this.pose3d[this.joints_map[start_joint_name]];
         const end_joint =
@@ -223,7 +223,7 @@ export default class JointsPosition2Rotation {
         ).normalize();
     }
 
-    #get_limb_quaternion(limb_name: string, up_vector: THREE.Vector3) {
+    #get_limb_quaternion(limb_name: string, up_vector: THREE.Vector3): THREE.Quaternion {
         const limb = this.limb_joint_pairs[limb_name];
 
         const target_vector = this.#get_joint_world_vector(limb[0], limb[1]);
@@ -291,8 +291,8 @@ export default class JointsPosition2Rotation {
         this.rotations["RightLeg"] = this.#get_limb_quaternion("RightLeg", new THREE.Vector3(0, 1, 0));
     }
 
-    getRotationsEuler() {
-        const eulers: { [key: string]: [number, number, number] } = {};
+    getRotationsEuler(): { [key: string]: Vector3Array } {
+        const eulers: { [key: string]: Vector3Array } = {};
         for (const key in this.rotations) {
             const euler = new THREE.Euler().setFromQuaternion(this.rotations[key], "XYZ");
             eulers[key] = [euler.x, euler.y, euler.z];
@@ -300,8 +300,8 @@ export default class JointsPosition2Rotation {
         return eulers;
     }
 
-    getRotationsQuaternion() {
-        const quaternions: { [key: string]: [number, number, number, number] } = {};
+    getRotationsQuaternion(): { [key: string]: QuaternionArray } {
+        const quaternions: { [key: string]: QuaternionArray } = {};
         for (const key in this.rotations) {
             quaternions[key] = [
                 this.rotations[key].x,

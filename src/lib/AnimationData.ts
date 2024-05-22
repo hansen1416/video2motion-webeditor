@@ -136,7 +136,7 @@ export default class AnimationData {
         return this.data[bone_name];
     }
 
-    setBoneData(bone_name: string, data: QuaternionArray[]) {
+    setBoneData(bone_name: string, data: QuaternionArray[]): void {
         this.data[bone_name] = data;
     }
 
@@ -144,7 +144,7 @@ export default class AnimationData {
         return this.keyframes[bone_name] ?? [];
     }
 
-    applyRotation(frame_idx: number) {
+    applyRotation(frame_idx: number): void {
 
         this.current_frame = frame_idx;
 
@@ -158,7 +158,7 @@ export default class AnimationData {
         }
     }
 
-    editBoneFrameRotation(bone_name: string, rotation: THREE.Euler, method: ApplyMethod) {
+    editBoneFrameRotation(bone_name: string, rotation: THREE.Euler, method: ApplyMethod): void {
 
         const q = new THREE.Quaternion().setFromEuler(rotation);
         // edit animation data at `current_frame`, on bone `bone_name`
@@ -183,7 +183,7 @@ export default class AnimationData {
         }
     }
 
-    #linearInterpolate(bone_name: string, left: number, right: number) {
+    #linearInterpolate(bone_name: string, left: number, right: number): void {
 
         const boneAnimationData = this.getBoneData(bone_name);
 
@@ -213,10 +213,10 @@ export default class AnimationData {
         this.setBoneData(bone_name, boneAnimationData);
     }
 
-    #bezierInterpolate(bone_name: string, left: number, right: number) { }
+    #bezierInterpolate(bone_name: string, left: number, right: number): void { }
 
 
-    addKeyFrame(bone_name: string, frame_idx: number) {
+    addKeyFrame(bone_name: string, frame_idx: number): void {
         let boneKeyFrame = this.getBoneKeyFrames(bone_name);
 
         // check if frame_idx is already a keyframe
@@ -228,7 +228,7 @@ export default class AnimationData {
     }
 
 
-    deleteKeyFrame(bone_name: string, frame_idx: number) {
+    deleteKeyFrame(bone_name: string, frame_idx: number): void {
         let boneKeyFrame = this.getBoneKeyFrames(bone_name);
 
         const idx = boneKeyFrame.indexOf(frame_idx);
@@ -239,7 +239,7 @@ export default class AnimationData {
         }
     }
 
-    exportData() {
+    exportData(): { data: AnimationDataObject, keyframes: { [key: string]: number[] } } {
         return {
             data: this.data,
             keyframes: this.keyframes

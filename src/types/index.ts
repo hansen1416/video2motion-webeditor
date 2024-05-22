@@ -10,6 +10,8 @@ export type BoneMapping = { [key: string]: THREE.Bone };
 
 export type QuaternionArray = [number, number, number, number];
 
+export type Vector3Array = [number, number, number];
+
 export type AnimationDataObject = { [key: string]: QuaternionArray[] };
 
 export type AnimationFrameDataObject = { [key: string]: QuaternionArray }

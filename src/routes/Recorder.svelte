@@ -77,7 +77,7 @@
 			document.documentElement.clientWidth / 2,
 			document.documentElement.clientHeight,
 		);
-
+		// initialize the animation data with the model bone names
 		animationData.initalize(jointsPos2Rot.getModelBoneNames());
 
 		Promise.all([
@@ -93,18 +93,11 @@
 			threeScene.scene.add(diva);
 
 			diva.traverse((node: THREE.Object3D) => {
-				// @ts-ignore
-				if (node.isMesh) {
+				if ((node as THREE.SkinnedMesh).isMesh) {
 					node.castShadow = true;
-
-					const mat = (node as THREE.SkinnedMesh)
-						.material as THREE.MeshStandardMaterial;
-
-					mat.transparent = true;
 				}
-				// @ts-ignore
-				if (node.isBone) {
-					// @ts-ignore
+
+				if ((node as THREE.Bone).isBone) {
 					if (bones[node.name] === undefined) {
 						// somehow maximo has double bones, so only use the first one
 						bones[node.name] = node as THREE.Bone;
@@ -151,9 +144,7 @@
 		};
 
 		video.onloadeddata = () => {
-			if (poseLandmarker) {
-				videoReady = true;
-			}
+			videoReady = true;
 		};
 
 		video.onended = () => {
